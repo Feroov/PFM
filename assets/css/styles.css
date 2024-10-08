@@ -9,10 +9,133 @@
     --border-color: #e2e8f0;
 }
 
+.dark-mode {
+    --background-color: #1e293b;
+    --card-background: #2d3748;
+    --text-primary: #ffffff;
+    --text-secondary: #cbd5e1;
+    --border-color: #4a5568;
+}
+
+.action-button svg {
+    stroke: var(--text-primary);
+}
+
+.dark-mode .action-button svg {
+    stroke: #ffffff;
+}
+
+.transaction-type-icon svg {
+    stroke: var(--text-primary);
+}
+
+.dark-mode .transaction-type-icon svg {
+    stroke: #ffffff;
+}
+
+.transaction-type-icon.income svg {
+    stroke: var(--success-color);
+}
+
+.transaction-type-icon.expense svg {
+    stroke: var(--danger-color);
+}
+
+.dark-mode .transaction-type-icon.income svg {
+    stroke: #10B981;
+}
+
+.dark-mode .transaction-type-icon.expense svg {
+    stroke: #ff8484;
+}
+
+.btn-outline {
+    border-color: var(--border-color);
+    color: var(--text-primary);
+    background-color: transparent;
+}
+
+.btn-outline:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: rgba(37, 99, 235, 0.1);
+}
+
+.dark-mode .btn-outline {
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+.dark-mode .btn-outline:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+    background-color: rgba(37, 99, 235, 0.2);
+}
+
+.dark-mode .import-section .btn-outline {
+    border-color: #10B981;
+    color: #10B981;
+}
+
+.dark-mode .import-section .btn-outline:hover {
+    background-color: rgba(16, 185, 129, 0.2);
+}
+
+.dark-mode .export-section .btn-outline {
+    border-color: #5088ff;
+    color: #437eff;
+}
+
+.dark-mode .export-section .btn-outline:hover {
+    background-color: rgba(37, 99, 235, 0.2);
+}
+
+.transaction-amount.income {
+    color: var(--success-color);
+}
+
+.transaction-amount.expense {
+    color: var(--danger-color);
+}
+
+.dark-mode .transaction-amount.income {
+    color: #10B981;
+}
+
+.dark-mode .transaction-amount.expense {
+    color: #ff8484;
+}
+
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+    background-color: var(--card-background);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    padding: 0 1rem;
+    transition: background-color 0.5s ease;
+}
+
+.navbar-option {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+
+
+h2 {
+    font-size: 20px;
 }
 
 body {
@@ -20,6 +143,7 @@ body {
     background-color: var(--background-color);
     color: var(--text-primary);
     line-height: 1.5;
+
 }
 
 .container {
@@ -28,9 +152,107 @@ body {
     padding: 2rem;
 }
 
+
+.navbar-option label {
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+
+#dark-mode-toggle {
+    transform: scale(1.5);
+    cursor: pointer;
+}
+
+
+.data-management-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.import-section,
+.export-section {
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+}
+
+.import-section h3,
+.export-section h3 {
+    margin-bottom: 1rem;
+    font-size: 1.125rem;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.import-buttons,
+.export-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+
+.import-buttons button,
+.export-buttons button {
+    width: 100%;
+    max-width: 200px;
+}
+
+.import-buttons,
+.export-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+    justify-items: center;
+}
+
+.transaction-container {
+    display: grid;
+    grid-template-columns: 1.4fr 1.5fr 0.1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.import-section .btn-outline {
+    border-color: #10B981;
+    color: #10B981;
+}
+
+.import-section .btn-outline:hover {
+    border-color: #059669;
+    color: #059669;
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.export-section .btn-outline {
+    border-color: #2563eb;
+    color: #2563eb;
+}
+
+.export-section .btn-outline:hover {
+    border-color: #1d4ed8;
+    color: #1d4ed8;
+    background: rgba(37, 99, 235, 0.1);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .data-management-container {
+        flex-direction: column;
+    }
+}
+
 .header {
     text-align: center;
     margin-bottom: 2rem;
+}
+
+.header-add {
+    padding-bottom: 38px;
 }
 
 .header h1 {
@@ -82,6 +304,17 @@ body {
     text-align: center;
 }
 
+.stat-card h2 {
+    font-size: 1.25rem;
+    opacity: 0.9;
+}
+
+.stat-amount {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0.5rem 0;
+}
+
 .stat-card.income {
     background-color: #dcfce7;
     color: var(--success-color);
@@ -96,8 +329,48 @@ body {
     background: var(--card-background);
     border-radius: 1rem;
     padding: 2rem;
-    margin-bottom: 2rem;
 }
+
+.transaction-form .input-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.transaction-form .input-group label {
+    flex: 1;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.transaction-form input,
+.transaction-form select {
+    width: 65%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 0.15s ease;
+    cursor: pointer;
+    text-align: left;
+}
+
+.transaction-form input:focus,
+.transaction-form select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+#add-transaction-btn {
+    margin-top: 1rem;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
 
 .form-grid {
     display: grid;
@@ -105,10 +378,11 @@ body {
     gap: 1rem;
 }
 
+
 .input-group {
     display: flex;
     align-items: center;
-    gap: 1rem; 
+    gap: 1rem;
     margin-bottom: 1rem;
 }
 
@@ -116,13 +390,13 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 0.5rem;
     color: var(--text-secondary);
     font-size: 0.875rem;
     text-align: center;
 }
 
-input, select {
+input,
+select {
     width: 100%;
     padding: 0.75rem;
     border: 1px solid var(--border-color);
@@ -133,7 +407,8 @@ input, select {
 }
 
 
-input:focus, select:focus {
+input:focus,
+select:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
@@ -161,7 +436,6 @@ input:focus, select:focus {
     background: var(--card-background);
     border-radius: 1rem;
     padding: 1.5rem;
-    margin-top: 2rem;
 }
 
 .transaction-items {
@@ -169,11 +443,11 @@ input:focus, select:focus {
     flex-direction: column;
     overflow-x: hidden;
     gap: 0.75rem;
-    max-height: 400px;
+    max-height: 300px;
     overflow-y: auto;
     scrollbar-width: auto;
     scrollbar-color: #888 #f1f1f1;
-    padding-bottom: 1rem; 
+    padding-bottom: 1rem;
 }
 
 
@@ -231,10 +505,37 @@ input:focus, select:focus {
 }
 
 .recurring-icon {
-    vertical-align: middle; 
+    vertical-align: middle;
     fill: currentColor;
     color: var(--primary-color);
 }
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    width: 80%;
+}
+
+.checkbox-group select {
+    flex: 1;
+}
+
+.checkbox-group label {
+    flex: 1;
+}
+
+#recurring-checkbox {
+    margin-right: 0.5rem;
+    width: auto;
+}
+
 
 .transaction-item.deleting {
     animation: slideOut 5.9s ease-out forwards;
@@ -336,9 +637,25 @@ input:focus, select:focus {
     color: var(--primary-color);
 }
 
-.action-button.delete:hover {
-    color: var(--danger-color);
+.action-button.delete {
+    color: var(--text-primary);
+    background-color: transparent;
 }
+
+.action-button.delete svg {
+    stroke: var(--text-primary);
+}
+
+.action-button.delete:hover {
+    color: white;
+    background-color: rgb(201, 41, 41);
+    transition: all 0.4s ease;
+}
+
+.action-button.delete:hover svg {
+    stroke: white;
+}
+
 
 .transaction-item.deleting {
     animation: slideOut 0.3s ease-out forwards;
@@ -369,9 +686,17 @@ input:focus, select:focus {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(1rem); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(1rem);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
+
 
 .btn-icon {
     padding: 0.5rem;
@@ -386,6 +711,28 @@ input:focus, select:focus {
     padding: 1.5rem;
     margin-top: 2rem;
 }
+
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+#delete-all-btn {
+    padding: 0.5rem 1rem;
+    color: black;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#delete-all-btn:hover {
+    background-color: #b91c1c;
+    color: white;
+}
+
 
 .modal {
     position: fixed;
@@ -415,7 +762,6 @@ input:focus, select:focus {
 }
 
 .csv-actions {
-    margin-top: 2.5rem;
     padding: 1.5rem;
 }
 
@@ -503,6 +849,7 @@ input:focus, select:focus {
     transition: transform 0.2s ease;
 }
 
+
 @media (max-width: 600px) {
     .input-group {
         flex-direction: column;
@@ -522,5 +869,58 @@ input:focus, select:focus {
 
     .form-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .transaction-container {
+        display: block;
+    }
+
+    .transaction-form,
+    .transaction-list,
+    .csv-actions {
+        margin-bottom: 2rem;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 0.75rem;
+        align-items: flex-start;
+    }
+
+    .input-group label {
+        margin-bottom: 0.25rem;
+        text-align: left;
+        width: 100%;
+    }
+
+    .input-group.checkbox-group {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .transaction-form input,
+    .transaction-form select {
+        padding: 0.5rem;
+        width: 100%;
+    }
+
+    .import-buttons button,
+    .export-buttons button {
+        width: 100%;
     }
 }

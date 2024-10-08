@@ -1,4 +1,3 @@
-// Selecting DOM elements
 const balanceEl = document.getElementById('balance');
 const incomeTotalEl = document.getElementById('income-total');
 const expenseTotalEl = document.getElementById('expense-total');
@@ -22,15 +21,46 @@ const editCategoryEl = document.getElementById('edit-category');
 const saveEditBtn = document.getElementById('save-edit-btn');
 const deleteAllBtn = document.getElementById('delete-all-btn');
 
+const darkModeToggle = document.getElementById('dark-mode-toggle');
 
-// Initialize transactions array (from localStorage if available)
+const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+
+
 let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-let transactionChart; // To hold the chart instance
+let transactionChart;
 let editIndex = null;
 
 // Categories for income and expense
 const incomeCategories = ['Salary', 'Bonus', 'Freelance', 'Other'];
 const expenseCategories = ['Rent', 'Food', 'Utilities', 'Entertainment', 'Other'];
+
+
+// Function to enable dark mode
+function enableDarkMode() {
+    document.body.classList.add('dark-mode');
+    localStorage.setItem('darkMode', 'enabled');
+}
+
+// Function to disable dark mode
+function disableDarkMode() {
+    document.body.classList.remove('dark-mode');
+    localStorage.setItem('darkMode', 'disabled');
+}
+
+// Set the initial state based on localStorage
+if (isDarkMode) {
+    enableDarkMode();
+    darkModeToggle.checked = true;
+}
+
+// Event listener for the dark mode toggle
+darkModeToggle.addEventListener('change', () => {
+    if (darkModeToggle.checked) {
+        enableDarkMode();
+    } else {
+        disableDarkMode();
+    }
+});
 
 // Show the edit modal and populate with data
 function openEditModal(index) {
@@ -38,7 +68,7 @@ function openEditModal(index) {
     editDescriptionEl.value = transaction.description;
     editAmountEl.value = transaction.amount;
     editTransactionTypeEl.value = transaction.type;
-    editIndex = index; // Track which transaction is being edited
+    editIndex = index;
     updateEditCategoryOptions();
     editCategoryEl.value = transaction.category;
     editModal.style.display = 'block';
@@ -47,7 +77,7 @@ function openEditModal(index) {
 // Close the edit modal
 function closeEditModal() {
     editModal.style.display = 'none';
-    editIndex = null; // Clear the edit index
+    editIndex = null;
 }
 
 // Save the edited transaction
@@ -72,25 +102,25 @@ saveEditBtn.addEventListener('click', saveEditTransaction);
 // Open the modal when clicking "Edit"
 function editTransaction(index) {
     const transaction = transactions[index];
-    
+
     // Fill the form with transaction data
     descriptionEl.value = transaction.description;
     amountEl.value = transaction.amount;
     transactionTypeEl.value = transaction.type;
     updateCategoryOptions();
     categoryEl.value = transaction.category;
-    
+
     if (transaction.isRecurring) {
         recurringCheckbox.checked = true;
         recurringIntervalEl.disabled = false;
         recurringIntervalEl.value = transaction.recurringInterval;
     }
-    
+
     // Remove the old transaction
     transactions.splice(index, 1);
     localStorage.setItem('transactions', JSON.stringify(transactions));
     updateUI();
-    
+
     // Scroll to form and show hint
     scrollToAddTransaction();
     showNotification('Edit your transaction and click "Add Transaction" to save changes');
@@ -109,7 +139,6 @@ function updateEditCategoryOptions() {
     });
 }
 
-// Function to update the UI
 function updateChart() {
     const income = transactions
         .filter(transaction => transaction.type === 'income')
@@ -122,8 +151,11 @@ function updateChart() {
     const ctx = document.getElementById('transactionChart').getContext('2d');
 
     if (transactionChart) {
-        transactionChart.destroy(); // Destroy the old chart instance if it exists
+        transactionChart.destroy();
     }
+
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    const textColor = isDarkMode ? '#ffffff' : '#000000';
 
     transactionChart = new Chart(ctx, {
         type: 'bar',
@@ -140,18 +172,67 @@ function updateChart() {
         options: {
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: {
+                        color: textColor
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: textColor
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false,
+                    labels: {
+                        color: textColor
+                    }
                 }
             },
             responsive: true,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
         }
     });
 }
+
+function handleDarkModeToggle() {
+    const darkModeIcon = document.getElementById('dark-mode-toggle');
+
+    // Check if dark mode is enabled
+    const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+    if (isDarkMode) {
+        enableDarkMode();
+    }
+
+    // Update chart and icon when dark mode is toggled
+    darkModeIcon.addEventListener('click', () => {
+        if (document.body.classList.contains('dark-mode')) {
+            disableDarkMode();
+            darkModeIcon.classList.replace('fa-sun', 'fa-moon');
+        } else {
+            enableDarkMode();
+            darkModeIcon.classList.replace('fa-moon', 'fa-sun');
+        }
+    });
+}
+
+function enableDarkMode() {
+    document.body.classList.add('dark-mode');
+    localStorage.setItem('darkMode', 'enabled');
+    updateChart();
+}
+
+function disableDarkMode() {
+    document.body.classList.remove('dark-mode');
+    localStorage.setItem('darkMode', 'disabled');
+    updateChart();
+}
+
+handleDarkModeToggle();
+
+updateChart();
+
 
 // Function to dynamically update the categories based on transaction type
 function updateCategoryOptions() {
@@ -239,10 +320,10 @@ function updateUI() {
         transactionEl.innerHTML = `
             <div class="transaction-info">
                 <div class="transaction-type-icon ${transaction.type}">
-                    ${transaction.type === 'income' ? 
-                        '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>' : 
-                        '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>'
-                    }
+                    ${transaction.type === 'income' ?
+                '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>' :
+                '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>'
+            }
                 </div>
                 <div class="transaction-details">
                     <span class="transaction-description">${transaction.description}</span>
@@ -304,7 +385,6 @@ function editTransaction(index) {
     updateUI();
 }
 
-
 // Function to add a new transaction
 function addTransaction() {
     const description = descriptionEl.value.trim();
@@ -340,6 +420,9 @@ function addTransaction() {
     amountEl.value = '';
     recurringCheckbox.checked = false;
     recurringIntervalEl.disabled = true;
+
+    // Show notification for successful transaction addition
+    showNotification('Transaction added successfully!', 'success');
 }
 
 
@@ -347,7 +430,7 @@ function addTransaction() {
 function removeTransaction(index) {
     const transactionEl = document.querySelectorAll('.transaction-item')[index];
     transactionEl.classList.add('deleting');
-    
+
     setTimeout(() => {
         transactions.splice(index, 1);
         localStorage.setItem('transactions', JSON.stringify(transactions));
@@ -355,7 +438,6 @@ function removeTransaction(index) {
         showNotification('Transaction deleted successfully');
     }, 300);
 }
-
 
 // Function to handle recurring transactions on a set interval
 function processRecurringTransactions() {
@@ -399,7 +481,7 @@ function showNotification(message, type = 'success') {
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.textContent = message;
-    
+
     Object.assign(notification.style, {
         position: 'fixed',
         top: '20px',
@@ -461,14 +543,14 @@ function importFromCSV(event) {
     }
 
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         try {
             const csvText = e.target.result;
             const rows = csvText.split('\n').filter(row => row.trim());
-            
+
             const newTransactions = rows.slice(1).map(row => {
                 const columns = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                
+
                 return {
                     description: columns[0].replace(/"/g, '').trim(),
                     amount: parseFloat(columns[1]),
@@ -479,7 +561,7 @@ function importFromCSV(event) {
                 };
             });
 
-            const validTransactions = newTransactions.filter(transaction => 
+            const validTransactions = newTransactions.filter(transaction =>
                 transaction.description &&
                 !isNaN(transaction.amount) &&
                 ['income', 'expense'].includes(transaction.type)
@@ -495,19 +577,209 @@ function importFromCSV(event) {
 
             showNotification('Successfully imported ' + validTransactions.length + ' transactions!');
             document.getElementById('csv-file').value = '';
-            
+
         } catch (error) {
             console.error('Error importing CSV:', error);
             showNotification('Error importing CSV file. Please check the file format.', 'error');
         }
     };
 
-    reader.onerror = function() {
+    reader.onerror = function () {
         showNotification('Error reading the file. Please try again.', 'error');
     };
 
     reader.readAsText(file);
 }
+
+function exportToPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Add Title
+    doc.setFontSize(20);
+    doc.text("Transaction Report", 10, 10);
+
+    let y = 20;
+
+    doc.setFontSize(12);
+    doc.text("Description", 10, y);
+    doc.text("Amount", 60, y);
+    doc.text("Type", 100, y);
+    doc.text("Category", 130, y);
+    doc.text("Recurring", 160, y);
+
+    y += 10;
+
+    // Iterate over transactions and add them to the PDF
+    transactions.forEach((transaction) => {
+        doc.text(transaction.description, 10, y);
+        doc.text(transaction.amount.toString(), 60, y);
+        doc.text(transaction.type, 100, y);
+        doc.text(transaction.category, 130, y);
+        doc.text(transaction.isRecurring ? "Yes" : "No", 160, y);
+        y += 10;
+    });
+
+    // Save the PDF
+    doc.save("transactions.pdf");
+}
+
+
+// Add event listener for PDF export button
+document.getElementById('export-pdf-btn').addEventListener('click', exportToPDF);
+
+function exportToExcel() {
+    const wb = XLSX.utils.book_new();
+
+    // Add a column for isRecurring
+    const ws_data = [["Description", "Amount", "Type", "Category", "Recurring"]];
+    transactions.forEach((transaction) => {
+        ws_data.push([
+            transaction.description,
+            transaction.amount,
+            transaction.type,
+            transaction.category,
+            transaction.isRecurring ? "Yes" : "No"
+        ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    XLSX.utils.book_append_sheet(wb, ws, "Transactions");
+
+    // Export the workbook
+    XLSX.writeFile(wb, "transactions.xlsx");
+}
+
+
+// Add event listener for Excel export button
+document.getElementById('export-excel-btn').addEventListener('click', exportToExcel);
+
+
+function importFromExcel(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        alert('Please select a file.');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+
+        // Convert worksheet data to JSON
+        const sheetData = XLSX.utils.sheet_to_json(worksheet);
+
+        const newTransactions = sheetData.map(row => {
+            return {
+                description: row['Description'],
+                amount: parseFloat(row['Amount']),
+                type: row['Type'],
+                category: row['Category'],
+                isRecurring: row['Recurring'] === 'Yes',
+                recurringInterval: row['RecurringInterval'] || null
+            };
+        });
+
+        const validTransactions = newTransactions.filter(transaction =>
+            transaction.description &&
+            !isNaN(transaction.amount) &&
+            ['income', 'expense'].includes(transaction.type)
+        );
+
+        if (validTransactions.length === 0) {
+            throw new Error('No valid transactions found in the Excel file.');
+        }
+
+        transactions.push(...validTransactions);
+        localStorage.setItem('transactions', JSON.stringify(transactions));
+        updateUI();
+
+        showNotification('Successfully imported ' + validTransactions.length + ' transactions from Excel!', 'success');
+        document.getElementById('excel-file').value = '';
+    };
+
+    reader.onerror = function () {
+        showNotification('Error reading the Excel file. Please try again.', 'error');
+    };
+
+    reader.readAsArrayBuffer(file);
+}
+
+// Add event listener for Excel import button
+document.getElementById('import-excel-btn').addEventListener('click', () => {
+    document.getElementById('excel-file').click();
+});
+document.getElementById('excel-file').addEventListener('change', importFromExcel);
+
+
+// Function to export transactions to JSON
+function exportToJSON() {
+    const jsonContent = JSON.stringify(transactions, null, 2);
+    const blob = new Blob([jsonContent], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'transactions.json');
+    a.click();
+
+    showNotification('JSON exported successfully!', 'success');
+}
+
+// Function to import transactions from JSON
+function importFromJSON(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        alert('Please select a JSON file.');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            const jsonText = e.target.result;
+            const importedTransactions = JSON.parse(jsonText);
+
+            // Validate the imported data
+            const validTransactions = importedTransactions.filter(transaction =>
+                transaction.description &&
+                !isNaN(transaction.amount) &&
+                ['income', 'expense'].includes(transaction.type)
+            );
+
+            if (validTransactions.length === 0) {
+                throw new Error('No valid transactions found in the JSON file.');
+            }
+
+            transactions.push(...validTransactions);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            updateUI();
+
+            showNotification(`Successfully imported ${validTransactions.length} transactions from JSON!`, 'success');
+            document.getElementById('json-file').value = '';
+        } catch (error) {
+            console.error('Error importing JSON:', error);
+            showNotification('Error importing JSON file. Please check the file format.', 'error');
+        }
+    };
+
+    reader.onerror = function () {
+        showNotification('Error reading the JSON file. Please try again.', 'error');
+    };
+
+    reader.readAsText(file);
+}
+
+// Add event listeners for JSON import/export buttons
+document.getElementById('export-json-btn').addEventListener('click', exportToJSON);
+document.getElementById('import-json-btn').addEventListener('click', () => {
+    document.getElementById('json-file').click();
+});
+document.getElementById('json-file').addEventListener('change', importFromJSON);
+
 
 // Add the notification animations
 const style = document.createElement('style');
@@ -523,7 +795,7 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Initialize existing event listeners
     addTransactionBtn.addEventListener('click', addTransaction);
     categoryFilterEl.addEventListener('change', updateUI);
@@ -538,40 +810,49 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     document.getElementById('csv-file').addEventListener('change', function (event) {
         console.log('File selected:', event.target.files[0]);
-        importFromCSV(event);  // Call the actual import function
+        importFromCSV(event);
     });
     document.getElementById('export-csv-btn').addEventListener('click', exportToCSV);
-    
-    
-    // Initial UI update
-    updateUI();
-});
 
-deleteAllBtn.addEventListener('click', () => {
-    const transactionEls = document.querySelectorAll('.transaction-item');
-    const transactionLength = transactionEls.length;
+    deleteAllBtn.addEventListener('click', () => {
+        const transactionEls = document.querySelectorAll('.transaction-item');
+        const transactionLength = transactionEls.length;
 
-    if (transactionLength === 0) return; // No transactions to delete
+        if (transactionLength === 0) return; // No transactions to delete
 
-    // Remove each transaction with a delay for the slide animation
-    transactionEls.forEach((transactionEl, index) => {
-        setTimeout(() => {
-            transactionEl.classList.add('deleting');
+        // Remove each transaction with a delay for the slide animation
+        transactionEls.forEach((transactionEl, index) => {
             setTimeout(() => {
-                transactionEl.remove();
-                // When the last transaction is removed, clear localStorage and update the UI
-                if (index === transactionLength - 1) {
-                    transactions = [];
-                    localStorage.setItem('transactions', JSON.stringify(transactions));
-                    updateUI(); // Refresh the UI after all are removed
-                }
-            }, 600); 
-        }, index * 200); 
+                transactionEl.classList.add('deleting');
+                setTimeout(() => {
+                    transactionEl.remove();
+                    // When the last transaction is removed, clear localStorage and update the UI
+                    if (index === transactionLength - 1) {
+                        transactions = [];
+                        localStorage.setItem('transactions', JSON.stringify(transactions));
+                        updateUI(); // Refresh the UI after all are removed
+                    }
+                }, 600);
+            }, index * 200);
+        });
+
+        showNotification('All transactions deleted successfully', 'success');
     });
 
-    showNotification('All transactions deleted successfully', 'success');
+    // Initial UI update
+    updateUI();
 });
 
 // Call processRecurringTransactions function every time the app loads
 processRecurringTransactions();
 
+window.onload = function () {
+    // Clear all form fields on page load
+    descriptionEl.value = '';
+    amountEl.value = '';
+    transactionTypeEl.value = 'income';
+    categoryEl.value = 'Salary';
+    recurringCheckbox.checked = false;
+    recurringIntervalEl.disabled = true;
+    recurringIntervalEl.value = 'daily';
+};
