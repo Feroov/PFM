@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Personal Finance Manager</h1>
+        </header>
+
+        <div class="dashboard-grid">
+            <div class="card balance-card">
+                <h2>Current Balance</h2>
+                <div class="balance-amount">$<span id="balance">0</span></div>
+            </div>
+
+            <div class="income-expense-container">
+                <div class="stat-card income">
+                    <h3>Income</h3>
+                    <div class="stat-amount">$<span id="income-total">0</span></div>
+                </div>
+                <div class="stat-card expense">
+                    <h3>Expenses</h3>
+                    <div class="stat-amount">$<span id="expense-total">0</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="transaction-form card">
+            <h2>Add New Transaction</h2>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="description">Description</label>
+                    <input type="text" id="description" placeholder="Enter description">
+                </div>
+                <div class="input-group">
+                    <label for="amount">Amount</label>
+                    <input type="number" id="amount" placeholder="Enter amount">
+                </div>
+                <div class="input-group">
+                    <label for="transaction-type">Type</label>
+                    <select id="transaction-type" onchange="updateCategoryOptions()">
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="category">Category</label>
+                    <select id="category"></select>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>
+                    <input type="checkbox" id="recurring-checkbox">
+                    Recurring Transaction
+                </label>
+                <select id="recurring-interval" disabled>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+            </div>
+            <button id="add-transaction-btn" class="btn btn-primary">Add Transaction</button>
+        </div>
+
+        <div class="transaction-list card">
+            <div class="list-header">
+                <!-- Master Delete Button -->
+                <button id="delete-all-btn" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> Delete All
+                </button>
+                <h2>Transaction History</h2>
+                <div class="filter-group">
+                    <label for="category-filter">Filter by Category</label>
+                    <select id="category-filter">
+                        <option value="all">All Categories</option>
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                        <option value="Salary">Salary</option>
+                        <option value="Food">Food</option>
+                        <option value="Rent">Rent</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="transaction-list" class="transaction-items"></div>
+        </div>
+
+        <div class="chart-container card">
+            <h2>Income vs Expenses</h2>
+            <canvas id="transactionChart"></canvas>
+        </div>
+
+        <div class="csv-actions card">
+            <h2>Data Management</h2>
+            <div class="csv-buttons-container">
+                <div class="csv-input-wrapper">
+                    <input type="file" id="csv-file" accept=".csv" class="file-input">
+                    <button id="import-csv-btn" class="btn btn-outline">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                        Import CSV
+                    </button>
+                </div>
+
+                <button id="export-csv-btn" class="btn btn-outline">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    Export CSV
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h2>Edit Transaction</h2>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="edit-description">Description</label>
+                    <input type="text" id="edit-description" placeholder="Description">
+                </div>
+                <div class="input-group">
+                    <label for="edit-amount">Amount</label>
+                    <input type="number" id="edit-amount" placeholder="Amount">
+                </div>
+                <div class="input-group">
+                    <label for="edit-transaction-type">Type</label>
+                    <select id="edit-transaction-type" onchange="updateEditCategoryOptions()">
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="edit-category">Category</label>
+                    <select id="edit-category"></select>
+                </div>
+            </div>
+            <button id="save-edit-btn" class="btn btn-primary">Save Changes</button>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>
