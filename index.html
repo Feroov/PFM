@@ -106,9 +106,13 @@
                         <option value="Other">Other</option>
                     </select>
                 </div>
-
+                <div id="arrow-container" class="arrow-container">
+                    <div class="arrow"></div>
+                </div>
+                
                 <div id="transaction-list" class="transaction-items"></div>
             </div>
+
             <!-- Data Management Section -->
             <div class="csv-actions card">
                 <h2>Data Management</h2>
@@ -163,43 +167,21 @@
         </div>
 
 
-        <div class="chart-container card">
-            <h2>Income vs Expenses</h2>
-            <br>
-            <canvas id="transactionChart"></canvas>
-        </div>
-
-
-    </div>
-
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeEditModal()">&times;</span>
-            <h2>Edit Transaction</h2>
-            <div class="form-grid">
-                <div class="input-group">
-                    <label for="edit-description">Description</label>
-                    <input type="text" id="edit-description" placeholder="Description">
-                </div>
-                <div class="input-group">
-                    <label for="edit-amount">Amount</label>
-                    <input type="number" id="edit-amount" placeholder="Amount">
-                </div>
-                <div class="input-group">
-                    <label for="edit-transaction-type">Type</label>
-                    <select id="edit-transaction-type" onchange="updateEditCategoryOptions()">
-                        <option value="income">Income</option>
-                        <option value="expense">Expense</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="edit-category">Category</label>
-                    <select id="edit-category"></select>
-                </div>
+        <div class="chart-row">
+            <div class="chart-container card">
+                <h2>Income vs Expenses</h2>
+                <br>
+                <canvas id="transactionChart" height="400"></canvas>
             </div>
-            <button id="save-edit-btn" class="btn btn-primary">Save Changes</button>
+            <div class="chart-container card">
+                <h2>Expenses Breakdown by Category</h2>
+                <br>
+                <canvas id="expenseCategoryChart"></canvas>
+            </div>
         </div>
+
     </div>
+
     <script src="./assets/js/app.js"></script>
 </body>
 

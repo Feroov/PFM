@@ -18,7 +18,6 @@ const editDescriptionEl = document.getElementById('edit-description');
 const editAmountEl = document.getElementById('edit-amount');
 const editTransactionTypeEl = document.getElementById('edit-transaction-type');
 const editCategoryEl = document.getElementById('edit-category');
-const saveEditBtn = document.getElementById('save-edit-btn');
 const deleteAllBtn = document.getElementById('delete-all-btn');
 
 const darkModeToggle = document.getElementById('dark-mode-toggle');
@@ -29,6 +28,7 @@ const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
 let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 let transactionChart;
 let editIndex = null;
+let expenseCategoryChart;
 
 // Categories for income and expense
 const incomeCategories = ['Salary', 'Bonus', 'Freelance', 'Other'];
@@ -62,9 +62,17 @@ darkModeToggle.addEventListener('change', () => {
     }
 });
 
+
 // Show the edit modal and populate with data
 function openEditModal(index) {
     const transaction = transactions[index];
+
+    // Add a null check here
+    if (!transaction) {
+        console.error(`Transaction at index ${index} is null or undefined`);
+        return; // Exit the function if no transaction is found
+    }
+
     editDescriptionEl.value = transaction.description;
     editAmountEl.value = transaction.amount;
     editTransactionTypeEl.value = transaction.type;
@@ -74,30 +82,65 @@ function openEditModal(index) {
     editModal.style.display = 'block';
 }
 
+
 // Close the edit modal
 function closeEditModal() {
     editModal.style.display = 'none';
     editIndex = null;
 }
 
-// Save the edited transaction
-function saveEditTransaction() {
-    const editedTransaction = {
-        description: editDescriptionEl.value,
-        amount: parseFloat(editAmountEl.value),
-        type: editTransactionTypeEl.value,
-        category: editCategoryEl.value
-    };
 
-    // Save the edited transaction in the array
-    transactions[editIndex] = editedTransaction;
-    localStorage.setItem('transactions', JSON.stringify(transactions));
-    closeEditModal();
-    updateUI(); // Refresh the UI after saving
+function updateExpenseCategoryChart() {
+    const ctx = document.getElementById('expenseCategoryChart').getContext('2d');
+
+    // Filter the transactions to only get expenses
+    const expenseTransactions = transactions.filter(transaction => transaction && transaction.type === 'expense');
+
+    // Calculate total amount spent in each category
+    const expenseData = expenseCategories.map(category => {
+        const total = expenseTransactions
+            .filter(transaction => transaction.category === category)
+            .reduce((sum, transaction) => sum + transaction.amount, 0);
+        return total;
+    });
+
+    // Remove old chart if it exists
+    if (expenseCategoryChart) {
+        expenseCategoryChart.destroy();
+    }
+
+    // Define colors for each category
+    const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
+
+    // Create the Doughnut chart with legend on top
+    expenseCategoryChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: expenseCategories,
+            datasets: [{
+                data: expenseData,
+                backgroundColor: colors,
+                borderColor: colors.map(color => color.replace('FF', 'AA')),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',  // Move the legend above the chart
+                    labels: {
+                        boxWidth: 20,  // Adjust the box size of the legend
+                        padding: 15,   // Adjust padding for spacing
+                    }
+                }
+            },
+            responsive: true,
+            maintainAspectRatio: false,
+        }
+    });
 }
 
-// Event listener for saving the edited transaction
-saveEditBtn.addEventListener('click', saveEditTransaction);
 
 // Open the modal when clicking "Edit"
 function editTransaction(index) {
@@ -141,12 +184,13 @@ function updateEditCategoryOptions() {
 
 function updateChart() {
     const income = transactions
-        .filter(transaction => transaction.type === 'income')
-        .reduce((sum, transaction) => sum + transaction.amount, 0);
+        .filter(transaction => transaction && transaction.type === 'income') // Add transaction check
+        .reduce((sum, transaction) => sum + (transaction.amount || 0), 0);
 
     const expenses = transactions
-        .filter(transaction => transaction.type === 'expense')
-        .reduce((sum, transaction) => sum + transaction.amount, 0);
+        .filter(transaction => transaction && transaction.type === 'expense') // Add transaction check
+        .reduce((sum, transaction) => sum + (transaction.amount || 0), 0);
+
 
     const ctx = document.getElementById('transactionChart').getContext('2d');
 
@@ -294,11 +338,19 @@ function updateUI() {
 
     const filterCategory = categoryFilterEl.value;
 
-    const sortedTransactions = [...transactions].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    // Filter out null or undefined transactions before sorting
+    const validTransactions = transactions.filter(transaction => transaction !== null && transaction !== undefined);
+
+    const sortedTransactions = [...validTransactions].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
     const fragment = document.createDocumentFragment();
 
     sortedTransactions.forEach((transaction, index) => {
+        if (!transaction) {
+            console.warn(`Transaction at index ${index} is null or undefined`);
+            return;
+        }
+
         if (filterCategory !== 'all' && transaction.category !== filterCategory) {
             return;
         }
@@ -361,7 +413,10 @@ function updateUI() {
     expenseTotalEl.textContent = formatAmount(expenses).replace('$', '');
 
     updateChart();
+    updateExpenseCategoryChart();  // Update the Doughnut chart
 }
+
+
 
 // Function to edit a transaction
 function editTransaction(index) {
@@ -444,6 +499,12 @@ function processRecurringTransactions() {
     const currentDate = new Date();
 
     transactions.forEach(transaction => {
+        // Check if the transaction is valid
+        if (!transaction) {
+            console.warn("Skipping null transaction in processRecurringTransactions.");
+            return;
+        }
+
         if (transaction.isRecurring) {
             const lastAddedDate = transaction.lastAddedDate ? new Date(transaction.lastAddedDate) : null;
             let shouldAdd = false;
@@ -457,7 +518,6 @@ function processRecurringTransactions() {
             }
 
             if (shouldAdd) {
-                // Add a new instance of the recurring transaction
                 transactions.push({
                     description: transaction.description,
                     amount: transaction.amount,
@@ -475,6 +535,7 @@ function processRecurringTransactions() {
     localStorage.setItem('transactions', JSON.stringify(transactions));
     updateUI();
 }
+
 
 
 function showNotification(message, type = 'success') {
@@ -743,11 +804,13 @@ function importFromJSON(event) {
             const jsonText = e.target.result;
             const importedTransactions = JSON.parse(jsonText);
 
-            // Validate the imported data
+            // Validate each transaction before adding it to the transactions array
             const validTransactions = importedTransactions.filter(transaction =>
-                transaction.description &&
+                transaction &&
+                typeof transaction.description === 'string' &&
                 !isNaN(transaction.amount) &&
-                ['income', 'expense'].includes(transaction.type)
+                ['income', 'expense'].includes(transaction.type) &&
+                typeof transaction.category === 'string'
             );
 
             if (validTransactions.length === 0) {
@@ -772,6 +835,7 @@ function importFromJSON(event) {
 
     reader.readAsText(file);
 }
+
 
 // Add event listeners for JSON import/export buttons
 document.getElementById('export-json-btn').addEventListener('click', exportToJSON);
