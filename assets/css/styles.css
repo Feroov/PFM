@@ -124,7 +124,7 @@
     padding: 0;
     max-width: 100%;
     box-sizing: border-box;
-    transition: background-color 0.5s ease, color 0.5s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .navbar {
@@ -1516,7 +1516,6 @@ textarea {
     }
 }
 
-/* Specific styles for the Delete All modal */
 .delete-all-modal {
     background-color: white;
     padding: 1.5rem;
@@ -1524,13 +1523,11 @@ textarea {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     text-align: center;
 
-    /* Adjust size for the delete all modal */
     width: 80%; 
     max-width: 400px; 
     height: auto; 
-    min-height: 250px; /* Reduced minimum height */
+    min-height: 250px;
 
-    /* Center content */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1539,21 +1536,21 @@ textarea {
 
 .delete-all-modal h2 {
     margin-top: 0;
-    margin-bottom: 0.75rem; /* Reduced bottom margin */
+    margin-bottom: 0.75rem;
     color: #333;
 }
 
 .delete-all-modal p {
-    margin-bottom: 1rem; /* Reduced bottom margin */
+    margin-bottom: 1rem;
     color: #666;
-    font-size: 1rem; /* Optional: adjust text size if needed */
+    font-size: 1rem;
 }
 
 .delete-all-modal .modal-buttons {
     display: flex;
     justify-content: center;
     gap: 1rem;
-    margin-top: 1rem; /* Reduced top margin */
+    margin-top: 1rem;
 }
 
 .delete-all-modal .modal-buttons button {
