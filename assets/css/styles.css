@@ -49,6 +49,17 @@
     stroke: #ff8484;
 }
 
+
+.dark-mode .recurring-icon,
+.dark-mode .recurring-text {
+    color: #a2dee4; 
+}
+
+.dark-mode .transaction-item .recurring-icon {
+    color: #a2dee4;
+    vertical-align: middle;
+}
+
 .btn-outline {
     border-color: var(--border-color);
     color: var(--text-primary);
@@ -521,7 +532,7 @@ select:focus {
 .recurring-icon {
     vertical-align: middle;
     fill: currentColor;
-    color: var(--primary-color);
+    color: #a2dee4;
 }
 
 .checkbox-group {
@@ -1278,6 +1289,12 @@ textarea {
     width: 100%;
 }
 
+@media (max-width: 768px) {
+    #no-transactions-message {
+        top: 85%;  /* Adjust to 85% for smaller screens */
+    }
+}
+
 .transaction-item {
     transition: all 0.4s ease;
     transform: translateX(0);
@@ -1287,4 +1304,11 @@ textarea {
 .transaction-item.deleting {
     transform: translateX(100%);
     opacity: 0;
+}
+
+@media (max-width: 768px) {
+    .transaction-actions {
+        justify-content: flex-end;
+        text-align: right;
+    }
 }

@@ -60,6 +60,7 @@ darkModeToggle.addEventListener('change', () => {
     } else {
         disableDarkMode();
     }
+    updateExpenseCategoryChart();
 });
 
 
@@ -112,7 +113,11 @@ function updateExpenseCategoryChart() {
     // Define colors for each category
     const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
 
-    // Create the Doughnut chart with legend on top
+    // Check if dark mode is active
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    const textColor = isDarkMode ? '#ffffff' : '#000000';
+
+    // Create the Doughnut chart with dynamic text color
     expenseCategoryChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -129,18 +134,26 @@ function updateExpenseCategoryChart() {
             plugins: {
                 legend: {
                     display: true,
-                    position: 'top',  // Move the legend above the chart
+                    position: 'top',
                     labels: {
-                        boxWidth: 20,  // Adjust the box size of the legend
-                        padding: 15,   // Adjust padding for spacing
+                        boxWidth: 20,
+                        padding: 15,
+                        color: textColor // Set the legend text color dynamically
                     }
                 }
             },
             responsive: true,
             maintainAspectRatio: false,
+            // Set the chart text color dynamically for tooltips
+            tooltips: {
+                bodyFontColor: textColor,
+                titleFontColor: textColor
+            }
         }
     });
 }
+
+
 
 
 // Open the modal when clicking "Edit"
@@ -266,12 +279,14 @@ function enableDarkMode() {
     document.body.classList.add('dark-mode');
     localStorage.setItem('darkMode', 'enabled');
     updateChart();
+    updateExpenseCategoryChart();
 }
 
 function disableDarkMode() {
     document.body.classList.remove('dark-mode');
     localStorage.setItem('darkMode', 'disabled');
     updateChart();
+    updateExpenseCategoryChart();
 }
 
 handleDarkModeToggle();
@@ -372,9 +387,9 @@ function updateUI() {
             const formattedDate = new Date(transaction.timestamp).toLocaleDateString();
 
             const recurringText = transaction.isRecurring
-                ? `<i class="fas fa-repeat recurring-icon"></i> Recurring (${transaction.recurringInterval})`
-                : '';
-
+            ? `<i class="fas fa-repeat recurring-icon"></i> <span class="recurring-text">Recurring (${transaction.recurringInterval})</span>`
+            : '';
+        
             transactionEl.innerHTML = `
                 <div class="transaction-info">
                     <div class="transaction-type-icon ${transaction.type}">
