@@ -1597,3 +1597,69 @@ textarea {
     background-color: #5a6268;
     transform: translateY(-2px);
 }
+
+@media (max-width: 768px) {
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .stat-card {
+        padding: 1em;
+    }
+
+    .stat-card h2 {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+    
+    .stat-amount {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+    }
+    
+
+    .income-expense-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .card,
+    .transaction-form,
+    .transaction-list,
+    .data-management-container > div {
+        width: 100%;
+    }
+
+    .import-buttons,
+    .export-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+
+    .import-buttons button,
+    .export-buttons button {
+        width: 100%;
+    }
+
+    .chart-container {
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    .transaction-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .transaction-info,
+    .transaction-actions {
+        width: 100%;
+    }
+}
