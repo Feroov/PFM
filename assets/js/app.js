@@ -118,6 +118,7 @@ function updateExpenseCategoryChart() {
         data: {
             labels: expenseCategories,
             datasets: [{
+                label: 'Amount ($)',
                 data: expenseData,
                 backgroundColor: colors,
                 borderColor: colors.map(color => color.replace('FF', 'AA')),
@@ -343,26 +344,20 @@ function updateUI() {
     const validTransactions = transactions.filter(transaction => transaction !== null && transaction !== undefined);
 
     if (validTransactions.length === 0) {
-        // Show the "No items found" message
         noTransactionsMessage.style.display = 'block';
     } else {
-        // Hide the message when there are transactions
         noTransactionsMessage.style.display = 'none';
 
         const sortedTransactions = [...validTransactions].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-        const fragment = document.createDocumentFragment();
-
-        sortedTransactions.forEach((transaction, index) => {
-            if (!transaction) {
-                console.warn(`Transaction at index ${index} is null or undefined`);
-                return;
-            }
+        sortedTransactions.forEach((transaction) => {
+            if (!transaction) return;
 
             if (filterCategory !== 'all' && transaction.category !== filterCategory) {
                 return;
             }
 
+            // Update totals
             if (transaction.type === 'income') {
                 income += transaction.amount;
             } else {
@@ -370,6 +365,9 @@ function updateUI() {
             }
 
             const transactionEl = document.createElement('div');
+            const actualIndex = transactions.indexOf(transaction);
+            transactionEl.setAttribute('data-transaction-index', actualIndex);
+            
             transactionEl.className = `transaction-item ${transaction.isRecurring ? 'recurring' : ''}`;
             const formattedDate = new Date(transaction.timestamp).toLocaleDateString();
 
@@ -381,9 +379,9 @@ function updateUI() {
                 <div class="transaction-info">
                     <div class="transaction-type-icon ${transaction.type}">
                         ${transaction.type === 'income' ?
-                    '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>' :
-                    '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>'
-                }
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>' :
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>'
+                        }
                     </div>
                     <div class="transaction-details">
                         <span class="transaction-description">${transaction.description}</span>
@@ -396,13 +394,13 @@ function updateUI() {
                     <span class="transaction-amount ${transaction.type}">
                         ${formatAmount(transaction.amount)}
                     </span>
-                    <button class="action-button edit" onclick="editTransaction(${index})" aria-label="Edit transaction">
+                    <button class="action-button edit" onclick="editTransaction(${actualIndex})" aria-label="Edit transaction">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" 
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
                         </svg>
                     </button>
-                    <button class="action-button delete" onclick="removeTransaction(${index})" aria-label="Delete transaction">
+                    <button class="action-button delete" onclick="removeTransaction(${actualIndex})" aria-label="Delete transaction">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" 
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
@@ -410,12 +408,11 @@ function updateUI() {
                     </button>
                 </div>
             `;
-            fragment.appendChild(transactionEl);
+            transactionListEl.appendChild(transactionEl);
         });
-
-        transactionListEl.appendChild(fragment);
     }
 
+    // Update totals and charts
     const balance = income - expenses;
     balanceEl.textContent = formatAmount(balance).replace('$', '');
     incomeTotalEl.textContent = formatAmount(income).replace('$', '');
@@ -424,7 +421,6 @@ function updateUI() {
     updateChart();
     updateExpenseCategoryChart();
 }
-
 
 // Function to edit a transaction
 function editTransaction(index) {
@@ -490,15 +486,37 @@ function addTransaction() {
 
 // Function to remove a transaction
 function removeTransaction(index) {
-    const transactionEl = document.querySelectorAll('.transaction-item')[index];
-    transactionEl.classList.add('deleting');
+    // Check if the index is valid
+    if (index < 0 || index >= transactions.length) {
+        console.error('Invalid transaction index:', index);
+        showNotification('Error deleting transaction', 'error');
+        return;
+    }
 
-    setTimeout(() => {
-        transactions.splice(index, 1);
-        localStorage.setItem('transactions', JSON.stringify(transactions));
-        updateUI();
-        showNotification('Transaction deleted successfully');
-    }, 300);
+    // Find the specific transaction element using a data attribute instead of index
+    const transactionEl = document.querySelector(`[data-transaction-index="${index}"]`);
+    
+    if (transactionEl) {
+        // Add the deletion animation class
+        transactionEl.classList.add('deleting');
+
+        // Wait for animation to complete before removing
+        setTimeout(() => {
+            // Remove the transaction from the array
+            transactions.splice(index, 1);
+            
+            // Update localStorage
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            
+            // Update the UI
+            updateUI();
+            
+            showNotification('Transaction deleted successfully');
+        }, 400); // Match this with your CSS animation duration
+    } else {
+        console.error('Transaction element not found');
+        showNotification('Error deleting transaction', 'error');
+    }
 }
 
 // Function to handle recurring transactions on a set interval

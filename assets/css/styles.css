@@ -1277,3 +1277,14 @@ textarea {
     text-align: center;
     width: 100%;
 }
+
+.transaction-item {
+    transition: all 0.4s ease;
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.transaction-item.deleting {
+    transform: translateX(100%);
+    opacity: 0;
+}
