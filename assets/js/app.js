@@ -63,41 +63,169 @@ darkModeToggle.addEventListener('change', () => {
     updateExpenseCategoryChart();
 });
 
+// Add these elements to your HTML modal structure
+const editRecurringCheckbox = document.getElementById('edit-recurring-checkbox');
+const editRecurringIntervalEl = document.getElementById('edit-recurring-interval');
+
 
 // Show the edit modal and populate with data
 function openEditModal(index) {
     const transaction = transactions[index];
 
-    // Add a null check here
     if (!transaction) {
         console.error(`Transaction at index ${index} is null or undefined`);
-        return; // Exit the function if no transaction is found
+        return;
     }
 
+    // Populate modal fields with existing transaction data
     editDescriptionEl.value = transaction.description;
     editAmountEl.value = transaction.amount;
     editTransactionTypeEl.value = transaction.type;
     editIndex = index;
+    
+    // Update recurring options for both recurring and non-recurring transactions
+    editRecurringCheckbox.checked = transaction.isRecurring || false;
+    editRecurringIntervalEl.value = transaction.recurringInterval || 'monthly';
+    editRecurringIntervalEl.disabled = !editRecurringCheckbox.checked;
+    
     updateEditCategoryOptions();
     editCategoryEl.value = transaction.category;
-    editModal.style.display = 'block';
+
+    // Display modal with fade-in
+    editModal.style.display = 'flex';
+    editModal.classList.remove('fade-out');
+    editModal.classList.add('fade-in');
 }
 
+function saveEditedTransaction() {
+    const updatedDescription = editDescriptionEl.value.trim();
+    const updatedAmount = parseFloat(editAmountEl.value);
+    const updatedType = editTransactionTypeEl.value;
+    const updatedCategory = editCategoryEl.value;
+    const updatedIsRecurring = editRecurringCheckbox.checked;
+    const updatedRecurringInterval = updatedIsRecurring ? editRecurringIntervalEl.value : null;
 
-// Close the edit modal
+    if (!updatedDescription || isNaN(updatedAmount)) {
+        showNotification('Please enter valid description and amount', 'error');
+        return;
+    }
+
+    // Get the current transaction
+    const currentTransaction = transactions[editIndex];
+
+    // Prepare the updated transaction
+    const updatedTransaction = {
+        ...currentTransaction,
+        description: updatedDescription,
+        amount: updatedAmount,
+        type: updatedType,
+        category: updatedCategory,
+        isRecurring: updatedIsRecurring,
+        recurringInterval: updatedRecurringInterval,
+    };
+
+    // If changing from non-recurring to recurring, add necessary properties
+    if (updatedIsRecurring && !currentTransaction.isRecurring) {
+        updatedTransaction.initialAmount = updatedAmount;
+        updatedTransaction.lastAddedDate = new Date().toISOString();
+    }
+
+    // If changing from recurring to non-recurring, remove recurring-specific properties
+    if (!updatedIsRecurring && currentTransaction.isRecurring) {
+        delete updatedTransaction.initialAmount;
+        delete updatedTransaction.lastAddedDate;
+        delete updatedTransaction.recurringInterval;
+    }
+
+    // Update the transaction in the array
+    transactions[editIndex] = updatedTransaction;
+
+    // Save updated transactions to localStorage
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+
+    // Update the UI and charts
+    updateUI();
+    closeEditModal();
+    
+    // Show appropriate notification
+    if (!currentTransaction.isRecurring && updatedIsRecurring) {
+        showNotification('Transaction updated and set to recurring!', 'success');
+    } else if (currentTransaction.isRecurring && !updatedIsRecurring) {
+        showNotification('Transaction updated and set to non-recurring!', 'success');
+    } else {
+        showNotification('Transaction updated successfully!', 'success');
+    }
+}
+
 function closeEditModal() {
-    editModal.style.display = 'none';
-    editIndex = null;
+    // Fade-out and hide the modal after the transition
+    editModal.classList.remove('fade-in');
+    editModal.classList.add('fade-out');
+    setTimeout(() => {
+        editModal.style.display = 'none';
+    }, 300); // Match this with the CSS transition duration
 }
+
+// Close modal when clicking outside the modal content
+editModal.addEventListener('click', function(event) {
+    if (event.target === editModal) {
+        closeEditModal();
+    }
+});
+
+// Event listener for recurring checkbox in edit modal
+editRecurringCheckbox.addEventListener('change', function() {
+    editRecurringIntervalEl.disabled = !this.checked;
+    
+    // If checked, ensure a default interval is selected
+    if (this.checked && !editRecurringIntervalEl.value) {
+        editRecurringIntervalEl.value = 'monthly';
+    }
+});
+
+// Update the saveEditedTransaction function
+function saveEditedTransaction() {
+    const updatedDescription = editDescriptionEl.value.trim();
+    const updatedAmount = parseFloat(editAmountEl.value);
+    const updatedType = editTransactionTypeEl.value;
+    const updatedCategory = editCategoryEl.value;
+    const updatedIsRecurring = editRecurringCheckbox.checked;
+    const updatedRecurringInterval = updatedIsRecurring ? editRecurringIntervalEl.value : null;
+
+    if (!updatedDescription || isNaN(updatedAmount)) {
+        showNotification('Please enter valid description and amount', 'error');
+        return;
+    }
+
+    // Update the existing transaction
+    transactions[editIndex] = {
+        ...transactions[editIndex],
+        description: updatedDescription,
+        amount: updatedAmount,
+        type: updatedType,
+        category: updatedCategory,
+        isRecurring: updatedIsRecurring,
+        recurringInterval: updatedRecurringInterval,
+    };
+
+    // Save updated transactions to localStorage
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+
+    // Update the UI and charts
+    updateUI();
+    closeEditModal();
+    showNotification('Transaction updated successfully!', 'success');
+}
+
 
 
 function updateExpenseCategoryChart() {
-    const ctx = document.getElementById('expenseCategoryChart').getContext('2d');
+    const chartCanvas = document.getElementById('expenseCategoryChart');
+    const noDataMessage = document.getElementById('no-data-expenses-category');
+    const ctx = chartCanvas.getContext('2d');
 
-    // Filter the transactions to only get expenses
     const expenseTransactions = transactions.filter(transaction => transaction && transaction.type === 'expense');
 
-    // Calculate total amount spent in each category
     const expenseData = expenseCategories.map(category => {
         const total = expenseTransactions
             .filter(transaction => transaction.category === category)
@@ -105,19 +233,24 @@ function updateExpenseCategoryChart() {
         return total;
     });
 
-    // Remove old chart if it exists
     if (expenseCategoryChart) {
         expenseCategoryChart.destroy();
     }
 
-    // Define colors for each category
-    const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
+    // If no data, hide chart and show "No data found"
+    if (expenseData.every(amount => amount === 0)) {
+        chartCanvas.style.display = 'none';
+        noDataMessage.style.display = 'block';
+        return;
+    } else {
+        chartCanvas.style.display = 'block';
+        noDataMessage.style.display = 'none';
+    }
 
-    // Check if dark mode is active
+    const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
     const isDarkMode = document.body.classList.contains('dark-mode');
     const textColor = isDarkMode ? '#ffffff' : '#000000';
 
-    // Create the Doughnut chart with dynamic text color
     expenseCategoryChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -138,23 +271,15 @@ function updateExpenseCategoryChart() {
                     labels: {
                         boxWidth: 20,
                         padding: 15,
-                        color: textColor // Set the legend text color dynamically
+                        color: textColor
                     }
                 }
             },
             responsive: true,
-            maintainAspectRatio: false,
-            // Set the chart text color dynamically for tooltips
-            tooltips: {
-                bodyFontColor: textColor,
-                titleFontColor: textColor
-            }
+            maintainAspectRatio: false
         }
     });
 }
-
-
-
 
 // Open the modal when clicking "Edit"
 function editTransaction(index) {
@@ -187,7 +312,9 @@ function editTransaction(index) {
 function updateEditCategoryOptions() {
     const selectedType = editTransactionTypeEl.value;
     editCategoryEl.innerHTML = '';
+
     const categories = selectedType === 'income' ? incomeCategories : expenseCategories;
+
     categories.forEach(category => {
         const option = document.createElement('option');
         option.value = category;
@@ -196,22 +323,34 @@ function updateEditCategoryOptions() {
     });
 }
 
+
 function updateChart() {
     const income = transactions
-        .filter(transaction => transaction && transaction.type === 'income') // Add transaction check
+        .filter(transaction => transaction && transaction.type === 'income')
         .reduce((sum, transaction) => sum + (transaction.amount || 0), 0);
 
     const expenses = transactions
-        .filter(transaction => transaction && transaction.type === 'expense') // Add transaction check
+        .filter(transaction => transaction && transaction.type === 'expense')
         .reduce((sum, transaction) => sum + (transaction.amount || 0), 0);
 
-
-    const ctx = document.getElementById('transactionChart').getContext('2d');
+    const chartCanvas = document.getElementById('transactionChart');
+    const noDataMessage = document.getElementById('no-data-income-expenses');
 
     if (transactionChart) {
         transactionChart.destroy();
     }
 
+    // If no income and expenses, hide chart and show "No data found"
+    if (income === 0 && expenses === 0) {
+        chartCanvas.style.display = 'none';
+        noDataMessage.style.display = 'block';
+        return;
+    } else {
+        chartCanvas.style.display = 'block';
+        noDataMessage.style.display = 'none';
+    }
+
+    const ctx = chartCanvas.getContext('2d');
     const isDarkMode = document.body.classList.contains('dark-mode');
     const textColor = isDarkMode ? '#ffffff' : '#000000';
 
@@ -253,6 +392,7 @@ function updateChart() {
         }
     });
 }
+
 
 function handleDarkModeToggle() {
     const darkModeIcon = document.getElementById('dark-mode-toggle');
@@ -439,24 +579,7 @@ function updateUI() {
 
 // Function to edit a transaction
 function editTransaction(index) {
-    const transaction = transactions[index];
-
-    // Populate the form with the transaction's current details
-    descriptionEl.value = transaction.description;
-    amountEl.value = transaction.amount;
-    transactionTypeEl.value = transaction.type;
-    updateCategoryOptions();  // Update categories based on type
-    categoryEl.value = transaction.category;
-
-    // Handle recurring transaction details
-    recurringCheckbox.checked = transaction.isRecurring;
-    recurringIntervalEl.disabled = !transaction.isRecurring;
-    recurringIntervalEl.value = transaction.recurringInterval || 'monthly';
-
-    // Remove the old transaction
-    transactions.splice(index, 1);
-    localStorage.setItem('transactions', JSON.stringify(transactions));
-    updateUI();
+    openEditModal(index);
 }
 
 // Function to add a new transaction
@@ -468,8 +591,9 @@ function addTransaction() {
     const isRecurring = recurringCheckbox.checked;
     const recurringInterval = isRecurring ? recurringIntervalEl.value : null;
 
+    // Show modal if description or amount is invalid
     if (!description || isNaN(amount)) {
-        alert('Please enter a valid description and amount.');
+        showModal();
         return;
     }
 
@@ -498,6 +622,40 @@ function addTransaction() {
 
     showNotification('Transaction added successfully!', 'success');
 }
+
+// Function to show the error modal
+function showModal() {
+    const modal = document.getElementById('errorModal');
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+
+    // Add fade-in animation class
+    modal.classList.add('fade-in');
+
+    // Automatically hide the modal after 2 seconds
+    setTimeout(() => {
+        modal.classList.remove('fade-in');
+        modal.classList.add('fade-out');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            modal.classList.remove('fade-out');
+        }, 500);
+    }, 3000);
+
+    // Allow manual close with fade-out effect
+    const closeModalBtn = document.getElementById('close-error-modal');
+    closeModalBtn.addEventListener('click', () => {
+        modal.classList.remove('fade-in');
+        modal.classList.add('fade-out');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            modal.classList.remove('fade-out');
+        }, 500);
+    });
+}
+
+
+
 
 // Function to remove a transaction
 function removeTransaction(index) {
@@ -991,16 +1149,23 @@ document.addEventListener('DOMContentLoaded', function () {
         document.body.appendChild(modal);
     
         document.getElementById('ok-button').addEventListener('click', () => {
-            modal.remove();
+            modal.classList.add('fade-out');
+            setTimeout(() => modal.remove(), 500);
         });
     
-        // Auto-dismiss after 3 seconds
+        setTimeout(() => {
+            if (document.body.contains(modal)) {
+                modal.classList.add('fade-out');
+            }
+        }, 2500);
+    
         setTimeout(() => {
             if (document.body.contains(modal)) {
                 modal.remove();
             }
         }, 3000);
     }
+    
 
     // Function to delete all transactions
     function deleteAllTransactions() {
@@ -1033,8 +1198,16 @@ document.addEventListener('DOMContentLoaded', function () {
             updateUI();
             loadingIndicator.remove();
             showNotification('All transactions deleted successfully', 'success');
+    
+            // Fade out the modal after deletion is completed
+            const modal = document.querySelector('.custom-modal');
+            if (modal) {
+                modal.classList.add('fade-out');
+                setTimeout(() => modal.remove(), 500);
+            }
         }, transactionLength * 100 + 500);
     }
+    
 
     deleteAllBtn.addEventListener('click', showDeleteConfirmationModal);
 

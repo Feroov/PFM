@@ -195,7 +195,7 @@ body {
 .data-management-container {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 3rem;
 }
 
 .import-section,
@@ -783,6 +783,14 @@ select:focus {
     margin-top: 2rem;
 }
 
+.no-data-message {
+    text-align: center;
+    font-size: 24px;
+    color: #888;
+    padding: 100px;
+}
+
+
 canvas {
     width: 100% !important;
     height: auto !important;
@@ -797,8 +805,20 @@ canvas {
     .chart-container {
         max-width: 100%;
     }
+    
+    .balance-card h2 {
+        font-size: 1.25rem;
+        opacity: 0.9;
+        text-align: center;
+    }
+    
+    .balance-amount {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+        text-align: center;
+    }
 }
-
 
 .list-header {
     display: flex;
@@ -822,34 +842,41 @@ canvas {
 }
 
 
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: none;
-    align-items: center;
-    justify-content: center;
+
+/* Save Button */
+.modal-content button[onclick="saveEditedTransaction()"] {
+    background-color: #28a745;
+    color: white;
 }
 
-.modal-content {
-    background: var(--card-background);
-    border-radius: 1rem;
-    padding: 2rem;
-    width: 90%;
-    max-width: 500px;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.modal-content button[onclick="saveEditedTransaction()"]:hover {
+    background-color: #218838;
 }
 
-.modal-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
+/* Cancel Button */
+.modal-content button[onclick="closeEditModal()"] {
+    background-color: #dc3545;
+    color: white;
 }
 
+.modal-content button[onclick="closeEditModal()"]:hover {
+    background-color: #c82333;
+}
+
+
+.modal-content .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.modal-content .close-button:hover {
+    color: #dc3545;
+}
 .close {
     position: absolute;
     top: 10px;
@@ -863,7 +890,7 @@ canvas {
 }
 
 .csv-actions h2 {
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
     font-size: 1.25rem;
     color: var(--text-primary);
 }
@@ -1099,8 +1126,8 @@ textarea {
     border-top: 4px solid #3498db;
     border-radius: 50%;
     animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
 }
-
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -1167,6 +1194,7 @@ textarea {
         opacity: 1;
     }
 }
+
 .custom-modal {
     position: fixed;
     top: 0;
@@ -1178,27 +1206,48 @@ textarea {
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    opacity: 0;
-    animation: modalFadeIn 0.3s ease forwards;
+    opacity: 1;
+    transition: opacity 0.5s ease;
 }
+
+.custom-modal.fade-out {
+    opacity: 0;
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.fade-out {
+    animation: fadeOut 0.5s ease forwards;
+}
+
 
 .custom-modal.closing {
     animation: modalFadeIn 0.3s ease forwards reverse;
 }
 
-.modal-content {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    text-align: center;
-    max-width: 400px;
-    width: 90%;
-    transform: scale(0.8);
-    opacity: 0;
-    animation: modalScaleIn 0.3s ease forwards;
-    animation-delay: 0.1s;
-}
+
+
 
 .modal-content.closing {
     animation: modalScaleOut 0.3s ease forwards;
@@ -1310,5 +1359,158 @@ textarea {
     .transaction-actions {
         justify-content: flex-end;
         text-align: right;
+    }
+}
+
+#editModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#editModal.fade-in {
+    opacity: 1;
+}
+
+#editModal .modal-content {
+    background-color: var(--card-background);
+    color: var(--text-primary);
+    padding: 2rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    animation: modalScaleIn 0.3s ease;
+}
+
+#editModal h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+}
+
+#editModal .form-group {
+    margin-bottom: 1.25rem;
+}
+
+#editModal label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+#editModal select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color); 
+    border-radius: 0.5rem; 
+    background-color: var(--card-background); 
+    color: var(--text-primary);
+    transition: border-color 0.15s ease;
+}
+
+#editModal input:focus,
+#editModal select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+#editModal .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+#editModal .checkbox-group input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.5rem;
+}
+
+#editModal .recurring-interval {
+    margin-top: 1rem;
+}
+
+#editModal .modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+#editModal .modal-buttons button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+#editModal .save-btn {
+    background-color: var(--success-color);
+    color: white;
+}
+
+#editModal .save-btn:hover {
+    background-color: #15803d;
+}
+
+#editModal .cancel-btn {
+    background-color: #e24f4f;
+    color: white;
+}
+
+#editModal .cancel-btn:hover {
+    background-color: #b91c1c;
+}
+
+.dark-mode #editModal input,
+.dark-mode #editModal select {
+    background-color: var(--card-background);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+.dark-mode #editModal input:focus,
+.dark-mode #editModal select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+@keyframes modalScaleIn {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    #editModal .modal-content {
+        padding: 1.5rem;
+    }
+    
+    #editModal .modal-buttons {
+        flex-direction: column;
+    }
+    
+    #editModal .modal-buttons button {
+        width: 100%;
     }
 }

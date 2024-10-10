@@ -76,17 +76,69 @@
                             </select>
                         </div>
                     </div>
-
-
-
                 </div>
+
+                <div id="errorModal" class="custom-modal" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <h2>Error</h2>
+                        <p>Please enter a valid description and amount.</p>
+                        <button id="close-error-modal" class="btn btn-primary">OK</button>
+                    </div>
+                </div>
+
 
                 <button id="add-transaction-btn" class="btn btn-primary">Add Transaction</button>
             </div>
 
             <!-- Transaction History Section -->
             <div class="transaction-list card">
-                
+                <!-- Edit Modal -->
+                <div id="editModal" class="modal" style="display: none;">
+                    <div class="modal-content">
+                        <h2>Edit Transaction</h2>
+                        <div class="form-group">
+                            <label for="edit-description">Description</label>
+                            <input type="text" id="edit-description" placeholder="Enter description">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-amount">Amount</label>
+                            <input type="number" id="edit-amount" placeholder="Enter amount">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-transaction-type">Type</label>
+                            <select id="edit-transaction-type">
+                                <option value="income">Income</option>
+                                <option value="expense">Expense</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-category">Category</label>
+                            <select id="edit-category"></select>
+                        </div>
+                        <div class="form-group recurring-section">
+
+                            <div class="recurring-interval">
+                                <div class="checkbox-group">
+                                    <label for="edit-recurring-checkbox">Make this a recurring transaction?</label>
+                                    <input type="checkbox" id="edit-recurring-checkbox">
+                                </div>
+                                <select id="edit-recurring-interval" disabled>
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-buttons">
+                            <button onclick="saveEditedTransaction()" class="save-btn">Save Changes</button>
+                            <button onclick="closeEditModal()" class="cancel-btn">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="list-header">
                     <h2>Transaction History</h2>
                     <button id="delete-all-btn" class="btn btn-danger" aria-label="Delete All Transactions">
@@ -110,7 +162,7 @@
                 <div id="arrow-container" class="arrow-container">
                     <div class="arrow"></div>
                 </div>
-                
+
                 <div id="transaction-list" class="transaction-items"></div>
                 <p id="no-transactions-message" class="no-entries" style="display:none;">No items found.</p>
             </div>
@@ -170,13 +222,20 @@
 
 
         <div class="chart-row">
+
             <div class="chart-container card">
                 <h2>Income vs Expenses</h2>
+                <div id="no-data-income-expenses" class="no-data-message" style="display: none;">
+                    No data found.
+                </div>
                 <br>
                 <canvas id="transactionChart" height="400"></canvas>
             </div>
             <div class="chart-container card">
                 <h2>Expenses Breakdown by Category</h2>
+                <div id="no-data-expenses-category" class="no-data-message" style="display: none;">
+                    No data found.
+                </div>
                 <br>
                 <canvas id="expenseCategoryChart"></canvas>
             </div>
