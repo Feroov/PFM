@@ -1420,6 +1420,7 @@ textarea {
     transition: border-color 0.15s ease;
 }
 
+
 #editModal input:focus,
 #editModal select:focus {
     outline: none;
@@ -1513,4 +1514,75 @@ textarea {
     #editModal .modal-buttons button {
         width: 100%;
     }
+}
+
+/* Specific styles for the Delete All modal */
+.delete-all-modal {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+
+    /* Adjust size for the delete all modal */
+    width: 80%; 
+    max-width: 400px; 
+    height: auto; 
+    min-height: 250px; /* Reduced minimum height */
+
+    /* Center content */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.delete-all-modal h2 {
+    margin-top: 0;
+    margin-bottom: 0.75rem; /* Reduced bottom margin */
+    color: #333;
+}
+
+.delete-all-modal p {
+    margin-bottom: 1rem; /* Reduced bottom margin */
+    color: #666;
+    font-size: 1rem; /* Optional: adjust text size if needed */
+}
+
+.delete-all-modal .modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem; /* Reduced top margin */
+}
+
+.delete-all-modal .modal-buttons button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.delete-all-modal .modal-buttons .btn-danger {
+    background-color: #dc3545;
+    color: white;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.delete-all-modal .modal-buttons .btn-danger:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+}
+
+.delete-all-modal .modal-buttons .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.delete-all-modal .modal-buttons .btn-secondary:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
 }

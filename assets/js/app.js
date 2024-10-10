@@ -1110,14 +1110,17 @@ document.addEventListener('DOMContentLoaded', function () {
         const modal = document.createElement('div');
         modal.className = 'custom-modal';
         modal.innerHTML = `
-            <div class="modal-content">
-                <h2>Confirm Deletion</h2>
-                <p>Are you sure you want to delete all transactions? This action cannot be undone.</p>
-                <div class="modal-buttons">
-                    <button id="confirm-delete" class="btn btn-danger">Delete All</button>
-                    <button id="cancel-delete" class="btn btn-secondary">Cancel</button>
+            <div class="custom-modal">
+                <div class="modal-content delete-all-modal">
+                    <h2>Confirm Deletion</h2>
+                    <p>Are you sure you want to delete all transactions? This action cannot be undone.</p>
+                    <div class="modal-buttons">
+                        <button id="confirm-delete" class="btn btn-danger">Delete All</button>
+                        <button id="cancel-delete" class="btn btn-secondary">Cancel</button>
+                    </div>
                 </div>
             </div>
+
         `;
         document.body.appendChild(modal);
 
