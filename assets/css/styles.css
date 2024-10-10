@@ -1607,16 +1607,20 @@ textarea {
     }
 
     .stat-card {
+        flex: 1;
         padding: 1em;
+        background-color: var(--card-background);
+        border-radius: 0.75rem;
+        text-align: center;
     }
 
-    .stat-card h2 {
+    .stat-card h3 {
         font-size: 1rem;
         opacity: 0.9;
     }
     
     .stat-amount {
-        font-size: 2rem;
+        font-size: 1.45rem;
         font-weight: 700;
         margin: 0.5rem 0;
     }
