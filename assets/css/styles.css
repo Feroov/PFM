@@ -117,8 +117,6 @@
     color: #ff8484;
 }
 
-
-
 * {
     margin: 0;
     padding: 0;
@@ -129,20 +127,40 @@
 
 .navbar {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     height: 60px;
     background-color: var(--card-background);
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
     padding: 0 1rem;
+    position: relative;
     transition: background-color 0.5s ease;
 }
 
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+}
+
 .navbar-option {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
+}
+
+.logo {
+    height: 40px;
+    display: block;
+}
+
+
+.navbar-option label {
+    font-size: 1rem;
+    color: var(--text-primary);
 }
 
 
@@ -180,10 +198,6 @@ body {
 }
 
 
-.navbar-option label {
-    font-size: 1rem;
-    color: var(--text-primary);
-}
 
 
 #dark-mode-toggle {
