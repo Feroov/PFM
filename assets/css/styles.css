@@ -173,11 +173,15 @@ html,
 body {
     height: 100%;
     overflow-x: hidden;
+    overflow-y: scroll;
     width: 100%;
     position: relative;
+    scrollbar-width: none;
 }
 
-
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+    display: none;
+}
 
 
 body {
@@ -318,7 +322,10 @@ body {
 .balance-card {
     background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
     color: white;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.277);
+    border: 3px solid rgba(37, 99, 235, 1);
 }
+
 
 .balance-card h2 {
     font-size: 1.25rem;
@@ -357,12 +364,18 @@ body {
 .stat-card.income {
     background-color: #dcfce7;
     color: var(--success-color);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(22, 163, 74, 0.219);
 }
 
 .stat-card.expense {
     background-color: #fee2e2;
     color: var(--danger-color);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(220, 38, 38, 0.219);
 }
+
+
 
 .transaction-form {
     background: var(--card-background);
@@ -490,24 +503,6 @@ select:focus {
 }
 
 
-.transaction-items::-webkit-scrollbar {
-    width: 12px;
-}
-
-.transaction-items::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-.transaction-items::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 6px;
-}
-
-/* For Mozilla Firefox */
-.transaction-items {
-    scrollbar-width: auto;
-    scrollbar-color: #888 #f1f1f1;
-}
 
 
 .transaction-item {
