@@ -45,6 +45,26 @@ const currencySymbols = {
 let currentCurrency = localStorage.getItem('currency') || 'usd';
 
 
+// Function to animate the number change
+function animateValue(element, start, end, duration) {
+    const range = end - start;
+    let startTime = null;
+
+    function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const progress = Math.min((timestamp - startTime) / duration, 1);
+        const value = Math.floor(progress * range + start);
+        element.textContent = formatAmount(value);
+
+        if (progress < 1) {
+            requestAnimationFrame(step);
+        } else {
+            element.textContent = formatAmount(end);  // Ensure final value is set
+        }
+    }
+
+    requestAnimationFrame(step);
+}
 
 
 // Function to enable dark mode
@@ -323,7 +343,7 @@ function updateExpenseCategoryChart() {
         },
         plugins: [ChartDataLabels]
     });
-    
+
 }
 
 
@@ -476,7 +496,7 @@ function updateChart() {
         },
         plugins: [ChartDataLabels]
     });
-    
+
 }
 
 
@@ -541,12 +561,7 @@ function updateCategoryOptions() {
 // Call the function initially to populate the categories when the page loads
 updateCategoryOptions();
 
-function formatAmount(amount) {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-    }).format(amount);
-}
+
 
 function scrollToAddTransaction() {
     const addTransactionForm = document.querySelector('.transaction-form');
@@ -654,9 +669,16 @@ function updateUI() {
 
     // Update balance, income, and expenses with formatted amounts
     const balance = income - expenses;
-    balanceEl.textContent = formatAmount(balance);
-    incomeTotalEl.textContent = formatAmount(income);
-    expenseTotalEl.textContent = formatAmount(expenses);
+    // Animate the balance, income, and expenses
+    animateValue(balanceEl, parseFloat(balanceEl.textContent.replace(/[^\d.-]/g, '')), balance, 1500);
+    animateValue(incomeTotalEl, parseFloat(incomeTotalEl.textContent.replace(/[^\d.-]/g, '')), income, 1500);
+    animateValue(expenseTotalEl, parseFloat(expenseTotalEl.textContent.replace(/[^\d.-]/g, '')), expenses, 1500);
+
+    // Add fade-in effect
+    balanceEl.classList.add('fade-in');
+    incomeTotalEl.classList.add('fade-in');
+    expenseTotalEl.classList.add('fade-in');
+
 
     updateChart();
     updateExpenseCategoryChart();
@@ -865,8 +887,12 @@ function showNotification(message, type = 'success') {
     }, 3000);
 }
 
-// Function to export transactions to CSV
 function exportToCSV() {
+    if (transactions.length === 0) {
+        showNoExportModal('CSV');
+        return;
+    }
+
     const csvRows = [];
     const headers = ['Description', 'Amount', 'Type', 'Category', 'IsRecurring', 'RecurringInterval'];
     csvRows.push(headers.join(','));
@@ -891,9 +917,85 @@ function exportToCSV() {
     a.setAttribute('download', 'transactions.csv');
     a.click();
 
-    // Show the success notification after the export is triggered
     showNotification('CSV exported successfully!', 'success');
 }
+
+function exportToPDF() {
+    if (transactions.length === 0) {
+        showNoExportModal('PDF');
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(20);
+    doc.text("Transaction Report", 10, 10);
+
+    let y = 20;
+    doc.setFontSize(12);
+    doc.text("Description", 10, y);
+    doc.text("Amount", 60, y);
+    doc.text("Type", 100, y);
+    doc.text("Category", 130, y);
+    doc.text("Recurring", 160, y);
+    y += 10;
+
+    transactions.forEach((transaction) => {
+        doc.text(transaction.description, 10, y);
+        doc.text(transaction.amount.toString(), 60, y);
+        doc.text(transaction.type, 100, y);
+        doc.text(transaction.category, 130, y);
+        doc.text(transaction.isRecurring ? "Yes" : "No", 160, y);
+        y += 10;
+    });
+
+    doc.save("transactions.pdf");
+    showNotification('PDF exported successfully!', 'success');
+}
+
+function exportToExcel() {
+    if (transactions.length === 0) {
+        showNoExportModal('Excel');
+        return;
+    }
+
+    const wb = XLSX.utils.book_new();
+    const ws_data = [["Description", "Amount", "Type", "Category", "Recurring"]];
+    transactions.forEach((transaction) => {
+        ws_data.push([
+            transaction.description,
+            transaction.amount,
+            transaction.type,
+            transaction.category,
+            transaction.isRecurring ? "Yes" : "No"
+        ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    XLSX.utils.book_append_sheet(wb, ws, "Transactions");
+
+    XLSX.writeFile(wb, "transactions.xlsx");
+    showNotification('Excel exported successfully!', 'success');
+}
+
+function exportToJSON() {
+    if (transactions.length === 0) {
+        showNoExportModal('JSON');
+        return;
+    }
+
+    const jsonContent = JSON.stringify(transactions, null, 2);
+    const blob = new Blob([jsonContent], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'transactions.json');
+    a.click();
+
+    showNotification('JSON exported successfully!', 'success');
+}
+
 
 
 // Function to import transactions from CSV
@@ -953,64 +1055,12 @@ function importFromCSV(event) {
     reader.readAsText(file);
 }
 
-function exportToPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
 
-    // Add Title
-    doc.setFontSize(20);
-    doc.text("Transaction Report", 10, 10);
-
-    let y = 20;
-
-    doc.setFontSize(12);
-    doc.text("Description", 10, y);
-    doc.text("Amount", 60, y);
-    doc.text("Type", 100, y);
-    doc.text("Category", 130, y);
-    doc.text("Recurring", 160, y);
-
-    y += 10;
-
-    // Iterate over transactions and add them to the PDF
-    transactions.forEach((transaction) => {
-        doc.text(transaction.description, 10, y);
-        doc.text(transaction.amount.toString(), 60, y);
-        doc.text(transaction.type, 100, y);
-        doc.text(transaction.category, 130, y);
-        doc.text(transaction.isRecurring ? "Yes" : "No", 160, y);
-        y += 10;
-    });
-
-    // Save the PDF
-    doc.save("transactions.pdf");
-}
 
 
 // Add event listener for PDF export button
 document.getElementById('export-pdf-btn').addEventListener('click', exportToPDF);
 
-function exportToExcel() {
-    const wb = XLSX.utils.book_new();
-
-    // Add a column for isRecurring
-    const ws_data = [["Description", "Amount", "Type", "Category", "Recurring"]];
-    transactions.forEach((transaction) => {
-        ws_data.push([
-            transaction.description,
-            transaction.amount,
-            transaction.type,
-            transaction.category,
-            transaction.isRecurring ? "Yes" : "No"
-        ]);
-    });
-
-    const ws = XLSX.utils.aoa_to_sheet(ws_data);
-    XLSX.utils.book_append_sheet(wb, ws, "Transactions");
-
-    // Export the workbook
-    XLSX.writeFile(wb, "transactions.xlsx");
-}
 
 
 // Add event listener for Excel export button
@@ -1078,18 +1128,6 @@ document.getElementById('import-excel-btn').addEventListener('click', () => {
 document.getElementById('excel-file').addEventListener('change', importFromExcel);
 
 
-// Function to export transactions to JSON
-function exportToJSON() {
-    const jsonContent = JSON.stringify(transactions, null, 2);
-    const blob = new Blob([jsonContent], { type: 'application/json' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('href', url);
-    a.setAttribute('download', 'transactions.json');
-    a.click();
-
-    showNotification('JSON exported successfully!', 'success');
-}
 
 // Function to import transactions from JSON
 function importFromJSON(event) {
@@ -1430,7 +1468,11 @@ document.getElementById('currency-gbp').addEventListener('click', () => changeCu
 // Format the amount with the current currency symbol
 function formatAmount(amount) {
     const symbol = currencySymbols[currentCurrency];
-    return `${symbol}${amount.toFixed(2)}`; // Only add the symbol once here
+    // Use toLocaleString for comma separation
+    return `${symbol}${amount.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    })}`;
 }
 
 
@@ -1466,15 +1508,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // Store the button's original position
         const buttonRect = infoButton.getBoundingClientRect();
         infoButton.style.transformOrigin = `${buttonRect.width / 2}px ${buttonRect.height / 2}px`;
-        
+
         // Start the animation
         infoButton.classList.add('animating');
-        
+
         // Show popup after button animation
         setTimeout(() => {
             infoPopup.classList.add('show');
         }, 10); // Match this with the animation duration
-        
+
         // Reset button after animation complete
         setTimeout(() => {
             infoButton.classList.remove('animating');
@@ -1488,7 +1530,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     closeInfoButton.addEventListener('click', closePopup);
-    
+
     // Close the popup when clicking outside of it
     infoPopup.addEventListener('click', (event) => {
         if (event.target === infoPopup) {
@@ -1497,4 +1539,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+function showNoExportModal(exportType) {
+    const modal = document.getElementById('no-export-modal');
+    const modalText = document.getElementById('no-export-modal-text');
 
+    // Customize the message based on export type
+    modalText.textContent = `No transactions available to export as ${exportType}.`;
+
+    // Show the modal
+    modal.style.display = 'flex';
+    modal.classList.remove('fade-out');
+    modal.classList.add('fade-in');
+
+    // Close the modal after a few seconds or on button click
+    const closeModalBtn = document.getElementById('close-no-export-modal');
+    closeModalBtn.addEventListener('click', () => {
+        modal.classList.remove('fade-in');
+        modal.classList.add('fade-out');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            modal.classList.remove('fade-out');
+        }, 500);
+    });
+
+    setTimeout(() => {
+        modal.classList.remove('fade-in');
+        modal.classList.add('fade-out');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 500);
+    }, 3000); // Auto-close after 3 seconds
+}
+
+
+document.getElementById('export-csv-btn').addEventListener('click', exportToCSV);
+document.getElementById('export-pdf-btn').addEventListener('click', exportToPDF);
+document.getElementById('export-excel-btn').addEventListener('click', exportToExcel);
+document.getElementById('export-json-btn').addEventListener('click', exportToJSON);
