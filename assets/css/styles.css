@@ -2203,3 +2203,88 @@ input[type="number"] {
 .modal-buttons .btn-primary:hover {
     background-color: #1d4ed8; /* Darker shade on hover for primary button */
 }
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    background-color: var(--card-background);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    padding: 0 1rem;
+}
+
+.navbar-logo {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-options {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* Added gap for spacing between elements */
+}
+
+.options-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+    gap: 0.5rem; /* Added gap for spacing between the cog and language selector */
+}
+
+#dark-mode-toggle {
+    transform: scale(1.5);
+    cursor: pointer;
+    margin-right: 1rem; /* Added margin to separate it from the other items */
+}
+
+#options-toggle {
+    cursor: pointer;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.currency-popup {
+    position: absolute;
+    top: calc(100% + 0.5rem); 
+    right: 0;
+    background-color: #1e2837;
+    border: 1px solid #2d3748;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    display: none; /* Initially hidden */
+    flex-direction: column;
+    gap: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.currency-popup.show {
+    display: flex;
+}
+
+.currency-btn {
+    background-color: #2d3748;
+    border: none;
+    color: #e2e8f0;
+    font-size: 0.875rem;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+}
+
+select#language-selector {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.25rem;
+    background-color: var(--card-background);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    cursor: pointer;
+}

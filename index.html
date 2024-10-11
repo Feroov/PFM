@@ -20,14 +20,13 @@
             <img src="./assets/img/logo.png" alt="Logo" class="logo">
         </div>
         <div class="navbar-options">
-            <!-- Existing Dark Mode Toggle -->
+            <!-- Dark Mode Toggle -->
             <i id="dark-mode-toggle" class="fas fa-moon" aria-label="Toggle dark mode"></i>
-       
-            <!-- New Options Button with Currency Popup -->
+
+            <!-- Options Button with Currency Popup -->
             <div class="options-container">
                 <i id="options-toggle" class="fas fa-cog" aria-label="Options"></i>
-       
-                <!-- Currency Selector Pop-up (Initially Hidden) -->
+                <!-- Currency Selector Pop-up -->
                 <div id="currency-popup" class="currency-popup">
                     <button id="currency-usd" class="currency-btn" aria-label="Switch to USD">
                         <i class="fas fa-dollar-sign"></i>
@@ -42,6 +41,14 @@
                         <i class="fas fa-info-circle"></i>
                     </button>
                 </div>
+
+                <!-- Language Selector -->
+                <select id="language-selector">
+                    <option value="en">English</option>
+                    <option value="tr">Turkish</option>
+                    <option value="de">German</option>
+                    <option value="es">Spanish</option>
+                </select>
             </div>
         </div>
 
@@ -50,7 +57,7 @@
                 <h2>PFM - Personal Finance Manager</h2>
                 <p><strong>Version:</strong> 1.0.0</p>
                 <p>At <strong>FeroBYTE</strong>, our mission is to simplify personal finance management, helping you stay in control of your financial health. Our app is designed to give you powerful tools to track your finances, gain insights, and make informed decisions effortlessly.</p>
-        
+
                 <h3>Our Key Features:</h3>
                 <ul>
                     <li><strong>Transaction Tracking:</strong> Categorize your income and expenses to get a detailed view of your finances.</li>
@@ -67,61 +74,53 @@
                 </button>
             </div>
         </div>
-        
-        
     </div>
-    
-    
 
     <div class="container">
-
-
         <div class="dashboard-grid">
             <div class="card balance-card">
-                <h2>Current Balance</h2>
-                <div class="balance-amount"></span><span id="balance">0</span></div>
+                <h2 id="balanceEl">Current Balance</h2>
+                <div class="balance-amount"><span id="balance">0</span></div>
             </div>
-        
+
             <div class="income-expense-container">
                 <div class="stat-card income">
-                    <h3>Income</h3>
+                    <h3 id="incomeTotalEl">Income</h3>
                     <div class="stat-amount"><span id="income-total">0</span></div>
                 </div>
                 <div class="stat-card expense">
-                    <h3>Expenses</h3>
+                    <h3 id="expenseTotalEl">Expenses</h3>
                     <div class="stat-amount"><span id="expense-total">0</span></div>
                 </div>
             </div>
         </div>
-        
 
         <div class="transaction-container">
             <div class="transaction-form card">
-                <h2 class="header-add">Add New Transaction</h2>
+                <h2 id="addTransactionBtn">Add New Transaction</h2>
                 <div class="form-grid">
-                    <!-- Existing form inputs -->
                     <div class="input-group">
-                        <label for="description">Description</label>
+                        <label id="descriptionElLabel" for="description">Description</label>
                         <input type="text" id="description" placeholder="Enter description">
                     </div>
                     <div class="input-group">
-                        <label for="amount">Amount</label>
+                        <label id="amountElLabel" for="amount">Amount</label>
                         <input type="number" id="amount" placeholder="Enter amount">
                     </div>
                     <div class="input-group">
-                        <label for="transaction-type">Type</label>
+                        <label id="transactionTypeElLabel" for="transaction-type">Type</label>
                         <select id="transaction-type" onchange="updateCategoryOptions()">
                             <option value="income">Income</option>
                             <option value="expense">Expense</option>
                         </select>
                     </div>
                     <div class="input-group">
-                        <label for="category">Category</label>
+                        <label id="categoryElLabel" for="category">Category</label>
                         <select id="category"></select>
                     </div>
 
                     <div class="input-group checkbox-group">
-                        <label for="recurring-checkbox">Recurring?</label>
+                        <label id="recurringCheckboxLabel" for="recurring-checkbox">Recurring?</label>
                         <div class="checkbox-wrapper">
                             <input type="checkbox" id="recurring-checkbox">
                             <select id="recurring-interval" disabled>
@@ -144,13 +143,10 @@
                     </div>
                 </div>
 
-
                 <button id="add-transaction-btn" class="btn btn-primary">Add Transaction</button>
             </div>
 
-            <!-- Transaction History Section -->
             <div class="transaction-list card">
-                <!-- Edit Modal -->
                 <div id="editModal" class="modal" style="display: none;">
                     <div class="modal-content">
                         <h2>Edit Transaction</h2>
@@ -174,7 +170,6 @@
                             <select id="edit-category"></select>
                         </div>
                         <div class="form-group recurring-section">
-
                             <div class="recurring-interval">
                                 <div class="checkbox-group">
                                     <label for="edit-recurring-checkbox">Make this a recurring transaction?</label>
@@ -195,9 +190,9 @@
                 </div>
 
                 <div class="list-header">
-                    <h2>Transaction History</h2>
+                    <h2 id="transactionHistoryTitle">Transaction History</h2>
                     <button id="delete-all-btn" class="btn btn-danger" aria-label="Delete All Transactions">
-                        <i class="fas fa-trash-alt"></i> Delete All
+                        <i class="fas fa-trash-alt"></i> <span id="deleteAllBtn">Delete All</span>
                     </button>
                 </div>
 
@@ -212,72 +207,63 @@
                         <option value="Other">Other</option>
                     </select>
                 </div>
-                <div id="arrow-container" class="arrow-container">
-                    <div class="arrow"></div>
-                </div>
 
                 <div id="transaction-list" class="transaction-items"></div>
                 <p id="no-transactions-message" class="no-entries" style="display:none;">No items found.</p>
             </div>
 
-            <!-- Data Management Section -->
             <div class="csv-actions card">
-                <h2>Data Management</h2>
+                <h2 id="exportData">Data Management</h2>
                 <div class="data-management-container">
-                    <!-- Import Section -->
                     <div class="import-section">
-                        <h3>Import Data</h3>
+                        <h3 id="importData">Import Data</h3>
                         <div class="import-buttons">
                             <button id="import-csv-btn" class="btn btn-outline">
                                 <input type="file" id="csv-file" accept=".csv" class="file-input">
-                                <i class="fa-solid fa-file-csv"></i>CSV
+                                <i class="fa-solid fa-file-csv"></i><span id="csvBtn">CSV</span>
                             </button>
 
                             <button id="import-excel-btn" class="btn btn-outline">
                                 <input type="file" id="excel-file" accept=".xlsx, .xls" class="file-input">
-                                <i class="fas fa-file-excel"></i>Excel
+                                <i class="fas fa-file-excel"></i><span id="excelBtn">Excel</span>
                             </button>
 
                             <button id="import-json-btn" class="btn btn-outline">
                                 <input type="file" id="json-file" accept=".json" class="file-input">
-                                <i class="fas fa-file-code"></i>JSON
+                                <i class="fas fa-file-code"></i><span id="jsonBtn">JSON</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Export Section -->
                     <div class="export-section">
                         <h3>Export Data</h3>
                         <div class="export-buttons">
                             <button id="export-csv-btn" class="btn btn-outline">
-                                <i class="fa-solid fa-file-csv"></i>CSV
+                                <i class="fa-solid fa-file-csv"></i><span id="csvExportBtn">CSV</span>
                             </button>
 
                             <button id="export-excel-btn" class="btn btn-outline">
-                                <i class="fas fa-file-excel"></i>Excel
+                                <i class="fas fa-file-excel"></i><span id="excelExportBtn">Excel</span>
                             </button>
 
                             <button id="export-pdf-btn" class="btn btn-outline">
-                                <i class="fas fa-file-pdf"></i>PDF
+                                <i class="fas fa-file-pdf"></i><span id="pdfExportBtn">PDF</span>
                             </button>
 
                             <button id="export-json-btn" class="btn btn-outline">
-                                <i class="fas fa-file-code"></i>JSON
+                                <i class="fas fa-file-code"></i><span id="jsonExportBtn">JSON</span>
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Add hidden inputs for JSON and XML imports -->
             <input type="file" id="xml-file" accept=".xml" class="file-input" style="display: none;">
         </div>
 
-
         <div class="chart-row">
-
             <div class="chart-container card">
-                <h2>Income vs Expenses</h2>
+                <h2 id="incomeVsExpensesTitle">Income vs Expenses</h2>
                 <div id="no-data-income-expenses" class="no-data-message" style="display: none;">
                     No data found.
                 </div>
@@ -285,7 +271,7 @@
                 <canvas id="transactionChart" height="400"></canvas>
             </div>
             <div class="chart-container card">
-                <h2>Expenses Breakdown by Category</h2>
+                <h2 id="expensesBreakdownTitle">Expenses Breakdown by Category</h2>
                 <div id="no-data-expenses-category" class="no-data-message" style="display: none;">
                     No data found.
                 </div>
@@ -293,10 +279,9 @@
                 <canvas id="expenseCategoryChart"></canvas>
             </div>
         </div>
-        <br>
-        <br>
+        <br><br>
     </div>
-    
+
     <div id="no-export-modal" class="custom-modal" style="display:none;">
         <div class="modal-content">
             <h2>Export Failed</h2>
@@ -306,7 +291,7 @@
             </div>
         </div>
     </div>
-    
+
     <script src="./assets/js/app.js"></script>
 </body>
 
