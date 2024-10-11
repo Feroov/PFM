@@ -82,12 +82,12 @@ function openEditModal(index) {
     editAmountEl.value = transaction.amount;
     editTransactionTypeEl.value = transaction.type;
     editIndex = index;
-    
+
     // Update recurring options for both recurring and non-recurring transactions
     editRecurringCheckbox.checked = transaction.isRecurring || false;
     editRecurringIntervalEl.value = transaction.recurringInterval || 'monthly';
     editRecurringIntervalEl.disabled = !editRecurringCheckbox.checked;
-    
+
     updateEditCategoryOptions();
     editCategoryEl.value = transaction.category;
 
@@ -146,7 +146,7 @@ function saveEditedTransaction() {
     // Update the UI and charts
     updateUI();
     closeEditModal();
-    
+
     // Show appropriate notification
     if (!currentTransaction.isRecurring && updatedIsRecurring) {
         showNotification('Transaction updated and set to recurring!', 'success');
@@ -167,23 +167,23 @@ function closeEditModal() {
 }
 
 // Close modal when clicking outside the modal content
-editModal.addEventListener('click', function(event) {
+editModal.addEventListener('click', function (event) {
     if (event.target === editModal) {
         closeEditModal();
     }
 });
 
 // Event listener for recurring checkbox in edit modal
-editRecurringCheckbox.addEventListener('change', function() {
+editRecurringCheckbox.addEventListener('change', function () {
     editRecurringIntervalEl.disabled = !this.checked;
-    
+
     // If checked, ensure a default interval is selected
     if (this.checked && !editRecurringIntervalEl.value) {
         editRecurringIntervalEl.value = 'monthly';
     }
 });
 
-// Update the saveEditedTransaction function
+
 function saveEditedTransaction() {
     const updatedDescription = editDescriptionEl.value.trim();
     const updatedAmount = parseFloat(editAmountEl.value);
@@ -218,7 +218,6 @@ function saveEditedTransaction() {
 }
 
 
-
 function updateExpenseCategoryChart() {
     const chartCanvas = document.getElementById('expenseCategoryChart');
     const noDataMessage = document.getElementById('no-data-expenses-category');
@@ -237,7 +236,6 @@ function updateExpenseCategoryChart() {
         expenseCategoryChart.destroy();
     }
 
-    // If no data, hide chart and show "No data found"
     if (expenseData.every(amount => amount === 0)) {
         chartCanvas.style.display = 'none';
         noDataMessage.style.display = 'block';
@@ -247,7 +245,15 @@ function updateExpenseCategoryChart() {
         noDataMessage.style.display = 'none';
     }
 
-    const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
+    // Softer, less eye-straining colors
+    const colors = [
+        'rgba(144, 205, 244, 0.6)',  // Soft blue
+        'rgba(229, 62, 62, 0.6)',    // Soft red
+        'rgba(255, 206, 86, 0.6)',   // Yellow
+        'rgba(75, 192, 192, 0.6)',   // Soft teal
+        'rgba(153, 102, 255, 0.6)'   // Soft purple
+    ];
+
     const isDarkMode = document.body.classList.contains('dark-mode');
     const textColor = isDarkMode ? '#ffffff' : '#000000';
 
@@ -259,7 +265,7 @@ function updateExpenseCategoryChart() {
                 label: 'Amount ($)',
                 data: expenseData,
                 backgroundColor: colors,
-                borderColor: colors.map(color => color.replace('FF', 'AA')),
+                borderColor: colors.map(color => color.replace('0.6', '1')), // Opaque border for all slices
                 borderWidth: 1
             }]
         },
@@ -273,13 +279,40 @@ function updateExpenseCategoryChart() {
                         padding: 15,
                         color: textColor
                     }
+                },
+                // Enable datalabels plugin with black opacity background
+                datalabels: {
+                    color: '#ffffff',  // Label text color
+                    font: {
+                        size: 12,    // Smaller font size for the labels
+                        weight: 'bold' // Make the label text bold
+                    },
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Black opacity background
+                    borderRadius: 4,
+                    padding: {
+                        top: 4,
+                        right: 8, // Increase right padding
+                        bottom: 4,
+                        left: 8  // Increase left padding
+                    },
+                    align: 'center',  // Center the label text horizontally
+                    anchor: 'center', // Ensure the label stays centered vertically
+                    formatter: function (value, context) {
+                        return value > 0 ? `$${value.toFixed(2)}` : '';  // Format the value
+                    },
+                    display: function (context) {
+                        return context.dataset.data[context.dataIndex] > 0;  // Only display labels for values > 0
+                    }
                 }
+                
             },
             responsive: true,
             maintainAspectRatio: false
-        }
+        },
+        plugins: [ChartDataLabels] // Add the datalabels plugin here
     });
 }
+
 
 // Open the modal when clicking "Edit"
 function editTransaction(index) {
@@ -323,7 +356,6 @@ function updateEditCategoryOptions() {
     });
 }
 
-
 function updateChart() {
     const income = transactions
         .filter(transaction => transaction && transaction.type === 'income')
@@ -352,7 +384,16 @@ function updateChart() {
 
     const ctx = chartCanvas.getContext('2d');
     const isDarkMode = document.body.classList.contains('dark-mode');
-    const textColor = isDarkMode ? '#ffffff' : '#000000';
+
+    // Set colors based on dark or light mode with opacity
+    const backgroundColor = isDarkMode ? '#2d3748' : '#ffffff';
+    const incomeBarColor = isDarkMode ? 'rgba(144, 205, 244, 0.6)' : 'rgba(49, 130, 206, 0.6)'; // Softer blue with opacity
+    const expensesBarColor = isDarkMode ? 'rgba(254, 178, 178, 0.6)' : 'rgba(229, 62, 62, 0.6)'; // Softer red with opacity
+    const borderColor = isDarkMode ? '#1a202c' : '#e2e8f0'; // Darker border for dark mode, lighter for light mode
+    const textColor = isDarkMode ? '#ffffff' : '#2d3748'; // White for dark mode, black for light mode
+
+    // Set the background of the canvas to the chosen background color
+    chartCanvas.style.backgroundColor = backgroundColor;
 
     transactionChart = new Chart(ctx, {
         type: 'bar',
@@ -361,8 +402,8 @@ function updateChart() {
             datasets: [{
                 label: 'Amount ($)',
                 data: [income, expenses],
-                backgroundColor: ['#28a745', '#dc3545'],
-                borderColor: ['#28a745', '#dc3545'],
+                backgroundColor: [incomeBarColor, expensesBarColor], // Colors for income and expenses bars with opacity
+                borderColor: [borderColor, borderColor],
                 borderWidth: 1
             }]
         },
@@ -371,25 +412,56 @@ function updateChart() {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        color: textColor
+                        color: textColor, // General labels color (white in dark mode, black in light mode)
+                    },
+                    grid: {
+                        color: borderColor, // Softer grid lines
                     }
                 },
                 x: {
                     ticks: {
-                        color: textColor
+                        color: textColor, // General labels color (white in dark mode, black in light mode)
+                    },
+                    grid: {
+                        color: borderColor, // Softer grid lines
                     }
                 }
             },
             plugins: {
                 legend: {
-                    display: false,
+                    display: false, // You can change this to true if you want to display the legend
                     labels: {
-                        color: textColor
+                        color: textColor // General labels color (white in dark mode, black in light mode)
                     }
+                },
+                // Datalabels plugin configuration for white text with a semi-transparent black background
+                datalabels: {
+                    color: '#ffffff', // White text
+                    anchor: 'center', // Center it vertically
+                    align: 'center',  // Center it horizontally
+                    font: {
+                        size: 14, // Adjust the font size if needed
+                        weight: 'bold'
+                    },
+                    formatter: function (value) {
+                        return `$${value.toFixed(2)}`; // Format the value with currency symbol
+                    },
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Semi-transparent black background
+                    borderRadius: 4, // Rounded corners for the background box
+                    padding: {
+                        top: 4,
+                        right: 6,
+                        bottom: 4,
+                        left: 6
+                    },
+                    // Fixing centering issue by adjusting the offset
+                    offset: 0 // Ensures proper alignment
                 }
             },
             responsive: true,
-        }
+            maintainAspectRatio: false
+        },
+        plugins: [ChartDataLabels] // Enable the datalabels plugin
     });
 }
 
@@ -430,7 +502,6 @@ function disableDarkMode() {
 }
 
 handleDarkModeToggle();
-
 updateChart();
 
 
@@ -522,21 +593,21 @@ function updateUI() {
             const transactionEl = document.createElement('div');
             const actualIndex = transactions.indexOf(transaction);
             transactionEl.setAttribute('data-transaction-index', actualIndex);
-            
+
             transactionEl.className = `transaction-item ${transaction.isRecurring ? 'recurring' : ''}`;
             const formattedDate = new Date(transaction.timestamp).toLocaleDateString();
 
             const recurringText = transaction.isRecurring
-            ? `<i class="fas fa-repeat recurring-icon"></i> <span class="recurring-text">Recurring (${transaction.recurringInterval})</span>`
-            : '';
-        
+                ? `<i class="fas fa-repeat recurring-icon"></i> <span class="recurring-text">Recurring (${transaction.recurringInterval})</span>`
+                : '';
+
             transactionEl.innerHTML = `
                 <div class="transaction-info">
                     <div class="transaction-type-icon ${transaction.type}">
                         ${transaction.type === 'income' ?
-                            '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>' :
-                            '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>'
-                        }
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>' :
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>'
+                }
                     </div>
                     <div class="transaction-details">
                         <span class="transaction-description">${transaction.description}</span>
@@ -654,9 +725,6 @@ function showModal() {
     });
 }
 
-
-
-
 // Function to remove a transaction
 function removeTransaction(index) {
     // Check if the index is valid
@@ -668,7 +736,7 @@ function removeTransaction(index) {
 
     // Find the specific transaction element using a data attribute instead of index
     const transactionEl = document.querySelector(`[data-transaction-index="${index}"]`);
-    
+
     if (transactionEl) {
         // Add the deletion animation class
         transactionEl.classList.add('deleting');
@@ -677,13 +745,13 @@ function removeTransaction(index) {
         setTimeout(() => {
             // Remove the transaction from the array
             transactions.splice(index, 1);
-            
+
             // Update localStorage
             localStorage.setItem('transactions', JSON.stringify(transactions));
-            
+
             // Update the UI
             updateUI();
-            
+
             showNotification('Transaction deleted successfully');
         }, 400); // Match this with your CSS animation duration
     } else {
@@ -1150,34 +1218,34 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
         `;
         document.body.appendChild(modal);
-    
+
         document.getElementById('ok-button').addEventListener('click', () => {
             modal.classList.add('fade-out');
             setTimeout(() => modal.remove(), 500);
         });
-    
+
         setTimeout(() => {
             if (document.body.contains(modal)) {
                 modal.classList.add('fade-out');
             }
         }, 2500);
-    
+
         setTimeout(() => {
             if (document.body.contains(modal)) {
                 modal.remove();
             }
         }, 3000);
     }
-    
+
 
     // Function to delete all transactions
     function deleteAllTransactions() {
         const transactionListEl = document.getElementById('transaction-list');
         const transactionEls = transactionListEl.querySelectorAll('.transaction-item');
         const transactionLength = transactionEls.length;
-    
+
         if (transactionLength === 0) return;
-    
+
         // Create and add loading indicator
         const loadingIndicator = document.createElement('div');
         loadingIndicator.className = 'loading-indicator';
@@ -1186,14 +1254,14 @@ document.addEventListener('DOMContentLoaded', function () {
             <p>Deleting transactions...</p>
         `;
         transactionListEl.appendChild(loadingIndicator);
-    
+
         // Add deleting class to all transactions with a slight delay between each
         transactionEls.forEach((transactionEl, index) => {
             setTimeout(() => {
                 transactionEl.classList.add('deleting');
             }, index * 100);
         });
-    
+
         // After all animations have completed, delete all transactions
         setTimeout(() => {
             transactions = [];
@@ -1201,7 +1269,7 @@ document.addEventListener('DOMContentLoaded', function () {
             updateUI();
             loadingIndicator.remove();
             showNotification('All transactions deleted successfully', 'success');
-    
+
             // Fade out the modal after deletion is completed
             const modal = document.querySelector('.custom-modal');
             if (modal) {
@@ -1210,7 +1278,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }, transactionLength * 100 + 500);
     }
-    
+
 
     deleteAllBtn.addEventListener('click', showDeleteConfirmationModal);
 
