@@ -20,9 +20,27 @@
             <img src="./assets/img/logo.png" alt="Logo" class="logo">
         </div>
         <div class="navbar-option">
+            <!-- Existing Dark Mode Toggle -->
             <i id="dark-mode-toggle" class="fas fa-moon" aria-label="Toggle dark mode" style="cursor: pointer;"></i>
+    
+            <!-- New Options Button -->
+            <i id="options-toggle" class="fas fa-cog" aria-label="Options" style="cursor: pointer; margin-left: 1rem;"></i>
+    
+            <!-- Currency Selector Pop-up (Initially Hidden) -->
+            <div id="currency-popup" class="currency-popup hidden">
+                <button id="currency-usd" class="currency-btn" aria-label="Switch to USD">
+                    <i class="fas fa-dollar-sign"></i>
+                </button>
+                <button id="currency-eur" class="currency-btn" aria-label="Switch to EUR">
+                    <i class="fas fa-euro-sign"></i>
+                </button>
+                <button id="currency-gbp" class="currency-btn" aria-label="Switch to GBP">
+                    <i class="fas fa-pound-sign"></i>
+                </button>
+            </div>
         </div>
     </div>
+    
     
 
     <div class="container">
@@ -31,20 +49,21 @@
         <div class="dashboard-grid">
             <div class="card balance-card">
                 <h2>Current Balance</h2>
-                <div class="balance-amount">$<span id="balance">0</span></div>
+                <div class="balance-amount"></span><span id="balance">0</span></div>
             </div>
-
+        
             <div class="income-expense-container">
                 <div class="stat-card income">
                     <h3>Income</h3>
-                    <div class="stat-amount">$<span id="income-total">0</span></div>
+                    <div class="stat-amount"><span id="income-total">0</span></div>
                 </div>
                 <div class="stat-card expense">
                     <h3>Expenses</h3>
-                    <div class="stat-amount">$<span id="expense-total">0</span></div>
+                    <div class="stat-amount"><span id="expense-total">0</span></div>
                 </div>
             </div>
         </div>
+        
 
         <div class="transaction-container">
             <div class="transaction-form card">

@@ -34,6 +34,18 @@ let expenseCategoryChart;
 const incomeCategories = ['Salary', 'Bonus', 'Freelance', 'Other'];
 const expenseCategories = ['Rent', 'Food', 'Utilities', 'Entertainment', 'Other'];
 
+// Currency symbols
+const currencySymbols = {
+    usd: '$',
+    eur: '€',
+    gbp: '£'
+};
+
+// Get current currency from localStorage, default to USD
+let currentCurrency = localStorage.getItem('currency') || 'usd';
+
+
+
 
 // Function to enable dark mode
 function enableDarkMode() {
@@ -257,12 +269,14 @@ function updateExpenseCategoryChart() {
     const isDarkMode = document.body.classList.contains('dark-mode');
     const textColor = isDarkMode ? '#ffffff' : '#000000';
 
+    const symbol = currencySymbols[currentCurrency];
+
     expenseCategoryChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: expenseCategories,
             datasets: [{
-                label: 'Amount ($)',
+                label: `Amount (${symbol})`, // Update label with currency symbol
                 data: expenseData,
                 backgroundColor: colors,
                 borderColor: colors.map(color => color.replace('0.6', '1')), // Opaque border for all slices
@@ -280,37 +294,36 @@ function updateExpenseCategoryChart() {
                         color: textColor
                     }
                 },
-                // Enable datalabels plugin with black opacity background
                 datalabels: {
-                    color: '#ffffff',  // Label text color
+                    color: '#ffffff',
                     font: {
-                        size: 12,    // Smaller font size for the labels
-                        weight: 'bold' // Make the label text bold
+                        size: 12,
+                        weight: 'bold'
                     },
-                    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Black opacity background
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
                     borderRadius: 4,
                     padding: {
                         top: 4,
-                        right: 8, // Increase right padding
+                        right: 8,
                         bottom: 4,
-                        left: 8  // Increase left padding
+                        left: 8
                     },
-                    align: 'center',  // Center the label text horizontally
-                    anchor: 'center', // Ensure the label stays centered vertically
-                    formatter: function (value, context) {
-                        return value > 0 ? `$${value.toFixed(2)}` : '';  // Format the value
+                    align: 'center',
+                    anchor: 'center',
+                    formatter: function (value) {
+                        return value > 0 ? `${symbol}${value.toFixed(2)}` : '';  // Use dynamic currency symbol
                     },
                     display: function (context) {
-                        return context.dataset.data[context.dataIndex] > 0;  // Only display labels for values > 0
+                        return context.dataset.data[context.dataIndex] > 0; // Only display labels for values > 0
                     }
                 }
-                
             },
             responsive: true,
             maintainAspectRatio: false
         },
-        plugins: [ChartDataLabels] // Add the datalabels plugin here
+        plugins: [ChartDataLabels]
     });
+    
 }
 
 
@@ -395,14 +408,16 @@ function updateChart() {
     // Set the background of the canvas to the chosen background color
     chartCanvas.style.backgroundColor = backgroundColor;
 
+    const symbol = currencySymbols[currentCurrency];
+
     transactionChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: ['Income', 'Expenses'],
             datasets: [{
-                label: 'Amount ($)',
+                label: `Amount (${symbol})`, // Add the currency symbol to the label
                 data: [income, expenses],
-                backgroundColor: [incomeBarColor, expensesBarColor], // Colors for income and expenses bars with opacity
+                backgroundColor: [incomeBarColor, expensesBarColor],
                 borderColor: [borderColor, borderColor],
                 borderWidth: 1
             }]
@@ -412,57 +427,56 @@ function updateChart() {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        color: textColor, // General labels color (white in dark mode, black in light mode)
+                        color: textColor,
                     },
                     grid: {
-                        color: borderColor, // Softer grid lines
+                        color: borderColor,
                     }
                 },
                 x: {
                     ticks: {
-                        color: textColor, // General labels color (white in dark mode, black in light mode)
+                        color: textColor,
                     },
                     grid: {
-                        color: borderColor, // Softer grid lines
+                        color: borderColor,
                     }
                 }
             },
             plugins: {
                 legend: {
-                    display: false, // You can change this to true if you want to display the legend
+                    display: false,
                     labels: {
-                        color: textColor // General labels color (white in dark mode, black in light mode)
+                        color: textColor
                     }
                 },
-                // Datalabels plugin configuration for white text with a semi-transparent black background
                 datalabels: {
-                    color: '#ffffff', // White text
-                    anchor: 'center', // Center it vertically
-                    align: 'center',  // Center it horizontally
+                    color: '#ffffff',
+                    anchor: 'center',
+                    align: 'center',
                     font: {
-                        size: 14, // Adjust the font size if needed
+                        size: 14,
                         weight: 'bold'
                     },
                     formatter: function (value) {
-                        return `$${value.toFixed(2)}`; // Format the value with currency symbol
+                        return `${symbol}${value.toFixed(2)}`; // Use dynamic currency symbol
                     },
-                    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Semi-transparent black background
-                    borderRadius: 4, // Rounded corners for the background box
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    borderRadius: 4,
                     padding: {
                         top: 4,
                         right: 6,
                         bottom: 4,
                         left: 6
                     },
-                    // Fixing centering issue by adjusting the offset
-                    offset: 0 // Ensures proper alignment
+                    offset: 0
                 }
             },
             responsive: true,
             maintainAspectRatio: false
         },
-        plugins: [ChartDataLabels] // Enable the datalabels plugin
+        plugins: [ChartDataLabels]
     });
+    
 }
 
 
@@ -566,7 +580,7 @@ function updateUI() {
 
     const filterCategory = categoryFilterEl.value;
 
-    // Filter out null or undefined transactions before sorting
+    // Filter valid transactions
     const validTransactions = transactions.filter(transaction => transaction !== null && transaction !== undefined);
 
     if (validTransactions.length === 0) {
@@ -638,15 +652,16 @@ function updateUI() {
         });
     }
 
-    // Update totals and charts
+    // Update balance, income, and expenses with formatted amounts
     const balance = income - expenses;
-    balanceEl.textContent = formatAmount(balance).replace('$', '');
-    incomeTotalEl.textContent = formatAmount(income).replace('$', '');
-    expenseTotalEl.textContent = formatAmount(expenses).replace('$', '');
+    balanceEl.textContent = formatAmount(balance);
+    incomeTotalEl.textContent = formatAmount(income);
+    expenseTotalEl.textContent = formatAmount(expenses);
 
     updateChart();
     updateExpenseCategoryChart();
 }
+
 
 // Function to edit a transaction
 function editTransaction(index) {
@@ -1385,3 +1400,67 @@ window.onload = function () {
     recurringIntervalEl.disabled = true;
     recurringIntervalEl.value = 'daily';
 };
+
+// Function to update all currency symbols on the page
+function updateCurrencySymbols() {
+    const symbol = currencySymbols[currentCurrency];
+
+    // Update all elements that display the currency symbol, ensuring no duplicates
+    document.querySelectorAll('.currency-symbol').forEach(el => {
+        // Replace the symbol in the HTML to avoid duplicates
+        el.textContent = symbol;
+    });
+
+    // Update UI elements like balance, income, expenses by reformatting the amounts
+    updateUI();
+}
+
+// Function to handle currency change
+function changeCurrency(newCurrency) {
+    currentCurrency = newCurrency;
+    localStorage.setItem('currency', newCurrency);  // Save the currency in localStorage
+    updateCurrencySymbols();  // Update symbols on the page
+}
+
+// Event listeners for currency buttons
+document.getElementById('currency-usd').addEventListener('click', () => changeCurrency('usd'));
+document.getElementById('currency-eur').addEventListener('click', () => changeCurrency('eur'));
+document.getElementById('currency-gbp').addEventListener('click', () => changeCurrency('gbp'));
+
+// Format the amount with the current currency symbol
+function formatAmount(amount) {
+    const symbol = currencySymbols[currentCurrency];
+    return `${symbol}${amount.toFixed(2)}`; // Only add the symbol once here
+}
+
+
+
+
+// Call updateCurrencySymbols on page load to apply the correct currency
+document.addEventListener('DOMContentLoaded', function () {
+    updateCurrencySymbols();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const optionsToggle = document.getElementById('options-toggle');
+    const currencyPopup = document.getElementById('currency-popup');
+
+    // Toggle pop-up visibility on clicking the Options button
+    optionsToggle.addEventListener('click', () => {
+        if (currencyPopup.classList.contains('hidden')) {
+            currencyPopup.classList.remove('hidden');
+            currencyPopup.classList.add('visible');
+        } else {
+            currencyPopup.classList.remove('visible');
+            currencyPopup.classList.add('hidden');
+        }
+    });
+
+    // Close the popup when clicking outside of it
+    document.addEventListener('click', (event) => {
+        if (!currencyPopup.contains(event.target) && !optionsToggle.contains(event.target)) {
+            currencyPopup.classList.remove('visible');
+            currencyPopup.classList.add('hidden');
+        }
+    });
+});

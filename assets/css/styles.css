@@ -1664,3 +1664,104 @@ textarea {
         width: 100%;
     }
 }
+
+
+/* Currency Popup Styles */
+.currency-popup {
+    position: absolute;
+    top: 3.5rem; /* Adjusted for better positioning */
+    right: 1rem;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.currency-popup.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .currency-popup {
+        right: 0.5rem;
+        top: 3rem;
+    }
+}
+
+.currency-popup {
+    position: absolute;
+    top: 110%; /* Slightly below the options button */
+    right: 0;
+    background-color: #1e2837; /* Dark background to match the dashboard */
+    border: 1px solid #2d3748; /* Subtle border */
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px); /* Initial slide up */
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    margin-top: 0.5rem;
+}
+
+.currency-popup.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0); /* Slide down to its natural position */
+}
+
+.currency-btn {
+    background-color: #2d3748; /* Darker button background */
+    border: none;
+    color: #e2e8f0; /* Light text color */
+    font-size: 0.875rem;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.currency-btn:hover {
+    background-color: #4a5568; /* Lighter on hover */
+}
+
+/* Adjust positioning for smaller screens */
+@media (max-width: 768px) {
+    .currency-popup {
+        right: 0.5rem;
+    }
+}
+
+/* Dark mode styles */
+.dark-mode .currency-popup {
+    background-color: #1e2837;
+    border-color: #2d3748;
+}
+
+.dark-mode .currency-btn {
+    background-color: #2d3748;
+    color: #e2e8f0;
+}
+
+.dark-mode .currency-btn:hover {
+    background-color: #4a5568;
+}
