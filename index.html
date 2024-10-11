@@ -19,26 +19,56 @@
         <div class="navbar-logo">
             <img src="./assets/img/logo.png" alt="Logo" class="logo">
         </div>
-        <div class="navbar-option">
+        <div class="navbar-options">
             <!-- Existing Dark Mode Toggle -->
-            <i id="dark-mode-toggle" class="fas fa-moon" aria-label="Toggle dark mode" style="cursor: pointer;"></i>
-    
-            <!-- New Options Button -->
-            <i id="options-toggle" class="fas fa-cog" aria-label="Options" style="cursor: pointer; margin-left: 1rem;"></i>
-    
-            <!-- Currency Selector Pop-up (Initially Hidden) -->
-            <div id="currency-popup" class="currency-popup hidden">
-                <button id="currency-usd" class="currency-btn" aria-label="Switch to USD">
-                    <i class="fas fa-dollar-sign"></i>
-                </button>
-                <button id="currency-eur" class="currency-btn" aria-label="Switch to EUR">
-                    <i class="fas fa-euro-sign"></i>
-                </button>
-                <button id="currency-gbp" class="currency-btn" aria-label="Switch to GBP">
-                    <i class="fas fa-pound-sign"></i>
+            <i id="dark-mode-toggle" class="fas fa-moon" aria-label="Toggle dark mode"></i>
+       
+            <!-- New Options Button with Currency Popup -->
+            <div class="options-container">
+                <i id="options-toggle" class="fas fa-cog" aria-label="Options"></i>
+       
+                <!-- Currency Selector Pop-up (Initially Hidden) -->
+                <div id="currency-popup" class="currency-popup">
+                    <button id="currency-usd" class="currency-btn" aria-label="Switch to USD">
+                        <i class="fas fa-dollar-sign"></i>
+                    </button>
+                    <button id="currency-eur" class="currency-btn" aria-label="Switch to EUR">
+                        <i class="fas fa-euro-sign"></i>
+                    </button>
+                    <button id="currency-gbp" class="currency-btn" aria-label="Switch to GBP">
+                        <i class="fas fa-pound-sign"></i>
+                    </button>
+                    <button id="info" class="currency-btn">
+                        <i class="fas fa-info-circle"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="info-popup" class="info-popup">
+            <div class="info-content">
+                <h2>PFM - Personal Finance Manager</h2>
+                <p><strong>Version:</strong> 1.0.0</p>
+                <p>At <strong>FeroBYTE</strong>, our mission is to simplify personal finance management, helping you stay in control of your financial health. Our app is designed to give you powerful tools to track your finances, gain insights, and make informed decisions effortlessly.</p>
+        
+                <h3>Our Key Features:</h3>
+                <ul>
+                    <li><strong>Transaction Tracking:</strong> Categorize your income and expenses to get a detailed view of your finances.</li>
+                    <li><strong>Recurring Transactions:</strong> Automate your regular payments or income with recurring transactions.</li>
+                    <li><strong>Data Export:</strong> Easily export your transaction history to <strong>CSV, PDF, or Excel</strong> formats for further analysis or reporting.</li>
+                    <li><strong>Data Import:</strong> Seamlessly import transaction data from <strong>CSV, JSON, or Excel</strong> files, keeping all your financial information in one place.</li>
+                    <li><strong>Financial Insights:</strong> Visualize your data with interactive <strong>charts and reports</strong> to better understand your spending patterns.</li>
+                    <li><strong>Dark and Light Modes:</strong> Customize your app experience with light and dark mode themes for comfortable viewing.</li>
+                    <li><strong>Multi-Currency Support:</strong> Manage your transactions in different currencies, including <strong>USD, EUR, and GBP</strong>.</li>
+                </ul>
+
+                <button id="close-info" class="close-btn" aria-label="Close">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
         </div>
+        
+        
     </div>
     
     

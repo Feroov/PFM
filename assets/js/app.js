@@ -303,7 +303,7 @@ function updateExpenseCategoryChart() {
                     backgroundColor: 'rgba(0, 0, 0, 0.7)',
                     borderRadius: 4,
                     padding: {
-                        top: 4,
+                        top: 6,
                         right: 8,
                         bottom: 4,
                         left: 8
@@ -463,9 +463,9 @@ function updateChart() {
                     backgroundColor: 'rgba(0, 0, 0, 0.7)',
                     borderRadius: 4,
                     padding: {
-                        top: 4,
+                        top: 9,
                         right: 6,
-                        bottom: 4,
+                        bottom: 6,
                         left: 6
                     },
                     offset: 0
@@ -1434,8 +1434,6 @@ function formatAmount(amount) {
 }
 
 
-
-
 // Call updateCurrencySymbols on page load to apply the correct currency
 document.addEventListener('DOMContentLoaded', function () {
     updateCurrencySymbols();
@@ -1446,21 +1444,57 @@ document.addEventListener('DOMContentLoaded', () => {
     const currencyPopup = document.getElementById('currency-popup');
 
     // Toggle pop-up visibility on clicking the Options button
-    optionsToggle.addEventListener('click', () => {
-        if (currencyPopup.classList.contains('hidden')) {
-            currencyPopup.classList.remove('hidden');
-            currencyPopup.classList.add('visible');
-        } else {
-            currencyPopup.classList.remove('visible');
-            currencyPopup.classList.add('hidden');
-        }
+    optionsToggle.addEventListener('click', (event) => {
+        event.stopPropagation(); // Prevent the click from propagating and immediately closing the popup
+        currencyPopup.classList.toggle('show');
     });
 
     // Close the popup when clicking outside of it
     document.addEventListener('click', (event) => {
         if (!currencyPopup.contains(event.target) && !optionsToggle.contains(event.target)) {
-            currencyPopup.classList.remove('visible');
-            currencyPopup.classList.add('hidden');
+            currencyPopup.classList.remove('show');
         }
     });
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const infoButton = document.getElementById('info');
+    const infoPopup = document.getElementById('info-popup');
+    const closeInfoButton = document.getElementById('close-info');
+
+    infoButton.addEventListener('click', () => {
+        // Store the button's original position
+        const buttonRect = infoButton.getBoundingClientRect();
+        infoButton.style.transformOrigin = `${buttonRect.width / 2}px ${buttonRect.height / 2}px`;
+        
+        // Start the animation
+        infoButton.classList.add('animating');
+        
+        // Show popup after button animation
+        setTimeout(() => {
+            infoPopup.classList.add('show');
+        }, 10); // Match this with the animation duration
+        
+        // Reset button after animation complete
+        setTimeout(() => {
+            infoButton.classList.remove('animating');
+            infoButton.style.opacity = '1';
+        }, 20);
+    });
+
+    function closePopup() {
+        infoPopup.classList.remove('show');
+        infoButton.style.opacity = '1';
+    }
+
+    closeInfoButton.addEventListener('click', closePopup);
+    
+    // Close the popup when clicking outside of it
+    infoPopup.addEventListener('click', (event) => {
+        if (event.target === infoPopup) {
+            closePopup();
+        }
+    });
+});
+
+

@@ -323,7 +323,7 @@ body {
     background: var(--primary-color);
     color: white;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.13);
-    border: 2px solid rgb(0, 81, 255);
+    border: 2px solid #4162ce;
 }
 
 
@@ -1665,46 +1665,34 @@ textarea {
     }
 }
 
-
-/* Currency Popup Styles */
-.currency-popup {
-    position: absolute;
-    top: 3.5rem; /* Adjusted for better positioning */
-    right: 1rem;
-    background-color: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    padding: 0.75rem;
-    border-radius: 0.5rem;
+.navbar-options {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
+    align-items: center;
 }
 
-.currency-popup.visible {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
+.options-container {
+    position: relative;
+    padding-right: 9px;
+    padding-left: 9px;
 }
 
-@media (max-width: 768px) {
-    .currency-popup {
-        right: 0.5rem;
-        top: 3rem;
-    }
+
+#options-toggle {
+    cursor: pointer;
+    padding: 0.5rem;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .currency-popup {
     position: absolute;
-    top: 110%; /* Slightly below the options button */
-    right: 0;
-    background-color: #1e2837; /* Dark background to match the dashboard */
-    border: 1px solid #2d3748; /* Subtle border */
+    top: calc(100% + 0.5rem); 
+    right: 50%; 
+    transform: translateX(50%);
+    background-color: #1e2837;
+    border: 1px solid #2d3748;
     padding: 0.5rem;
     border-radius: 0.5rem;
     display: flex;
@@ -1712,23 +1700,20 @@ textarea {
     gap: 0.5rem;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-10px); /* Initial slide up */
-    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     z-index: 1000;
-    margin-top: 0.5rem;
 }
 
 .currency-popup.show {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0); /* Slide down to its natural position */
 }
 
 .currency-btn {
-    background-color: #2d3748; /* Darker button background */
+    background-color: #2d3748;
     border: none;
-    color: #e2e8f0; /* Light text color */
+    color: #e2e8f0;
     font-size: 0.875rem;
     padding: 0.5rem;
     border-radius: 0.25rem;
@@ -1737,21 +1722,21 @@ textarea {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
+    width: 2rem;
+    height: 2rem;
 }
 
 .currency-btn:hover {
-    background-color: #4a5568; /* Lighter on hover */
+    background-color: #4a5568;
 }
 
-/* Adjust positioning for smaller screens */
 @media (max-width: 768px) {
     .currency-popup {
-        right: 0.5rem;
+        right: 0;
+        transform: none;
     }
 }
 
-/* Dark mode styles */
 .dark-mode .currency-popup {
     background-color: #1e2837;
     border-color: #2d3748;
@@ -1764,4 +1749,247 @@ textarea {
 
 .dark-mode .currency-btn:hover {
     background-color: #4a5568;
+}
+
+
+#info {
+    position: relative;
+    cursor: pointer;
+    font-size: 1rem;
+    background-color: var(--primary-color, #0056b3);
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+#info:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    background-color: var(--primary-color-hover, #00408e);
+}
+
+
+.info-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+    z-index: 10000;
+}
+
+.info-popup.show {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0s linear 0s;
+}
+
+@keyframes contentAppear {
+    0% {
+        transform: scale(0.8) translateY(40px);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+.info-content {
+    background-color: var(--card-background, #ffffff);
+    color: var(--text-primary, #333333);
+    padding: 2.5rem;
+    border-radius: 1.2rem;
+    max-width: 40%;
+    max-height: 80%;
+    overflow-y: auto;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+    position: relative;
+    z-index: 10001;
+    transform: scale(0.8) translateY(30px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+.info-popup.show .info-content {
+    animation: contentAppear 0.5s ease 0.2s forwards;
+}
+
+.info-content h2 {
+    font-size: 2rem;
+    margin-bottom: 1.2rem;
+    color: #1773d4;
+    border-bottom: 3px solid #1773d4;
+    padding-bottom: 0.5rem;
+}
+
+.info-content p,
+.info-content li {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    color: var(--text-secondary, #666666);
+}
+
+.info-content ul {
+    padding-left: 1.5rem;
+}
+
+.info-content li {
+    list-style-type: disc;
+}
+
+.close-btn {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+    background: none;
+    border: none;
+    color: var(--text-primary, #333333);
+    font-size: 2rem;
+    cursor: pointer;
+    z-index: 10002;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.close-btn:hover {
+    color: var(--primary-color, #0056b3);
+    transform: rotate(90deg);
+}
+
+
+.info-content a {
+    color: var(--primary-color, #0056b3);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.info-content a:hover {
+    color: var(--primary-color-hover, #003d80);
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.info-content::-webkit-scrollbar {
+    width: 10px;
+}
+
+.info-content::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.info-content::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+
+.info-content li {
+    list-style-type: none;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.info-content li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--primary-color, #0056b3);
+    font-size: 1.2rem;
+}
+
+/* Dark mode styles */
+.dark-mode .info-content {
+    background-color: var(--card-background, #2d3748);
+    color: var(--text-primary, #ffffff);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
+}
+
+.dark-mode .info-content h2 {
+    color: #ffffff;
+    border-bottom: 3px solid #5f81f1;
+}
+
+.dark-mode .info-content p,
+.dark-mode .info-content li {
+    color: var(--text-secondary, #cbd5e1);
+}
+
+.dark-mode .close-btn {
+    color: var(--text-primary, #ffffff);
+}
+
+.dark-mode .close-btn:hover {
+    color: var(--primary-color, #496de6);
+}
+
+.dark-mode .info-content a {
+    color: #fff;
+}
+
+.dark-mode .info-content a:hover {
+    color: var(--primary-color-hover, #00408e);
+    text-shadow: 0 2px 6px rgba(255, 255, 255, 0.2);
+}
+
+.dark-mode .info-content::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark-mode .info-content li::before {
+    color: #fff;
+}
+
+
+@media (max-width: 768px) {
+    .info-content {
+        max-width: 90%;
+        padding: 2rem;
+    }
+
+    .info-content h2 {
+        font-size: 1.75rem;
+    }
+
+    .info-content p, .info-content li {
+        font-size: 1rem;
+    }
+
+    .close-btn {
+        font-size: 1.75rem;
+        top: 0.75rem;
+        right: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .info-content {
+        max-width: 95%;
+        padding: 1.5rem;
+    }
+
+    .info-content h2 {
+        font-size: 1.5rem;
+    }
+
+    .info-content p, .info-content li {
+        font-size: 0.95rem;
+    }
+
+    .close-btn {
+        font-size: 1.5rem;
+        top: 0.5rem;
+        right: 0.5rem;
+    }
 }
