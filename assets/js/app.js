@@ -1,3 +1,21 @@
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        const loader = document.querySelector('.loader');
+        const overlay = document.querySelector('.loader-overlay');
+        const content = document.getElementById('content');
+
+        loader.classList.add('hidden');
+        overlay.classList.add('hidden');
+
+        setTimeout(function() {
+            loader.style.display = 'none';
+            overlay.style.display = 'none';
+            content.style.display = 'block';
+        }, 1500);
+
+    }, 2200);
+});
+
 const balanceEl = document.getElementById('balance');
 const incomeTotalEl = document.getElementById('income-total');
 const expenseTotalEl = document.getElementById('expense-total');
@@ -93,12 +111,12 @@ darkModeToggle.addEventListener('change', () => {
         disableDarkMode();
     }
     updateExpenseCategoryChart();
+    updateIncomeExpenseTrendsChart();
 });
 
 // Add these elements to your HTML modal structure
 const editRecurringCheckbox = document.getElementById('edit-recurring-checkbox');
 const editRecurringIntervalEl = document.getElementById('edit-recurring-interval');
-
 
 // Show the edit modal and populate with data
 function openEditModal(index) {
@@ -127,66 +145,6 @@ function openEditModal(index) {
     editModal.style.display = 'flex';
     editModal.classList.remove('fade-out');
     editModal.classList.add('fade-in');
-}
-
-function saveEditedTransaction() {
-    const updatedDescription = editDescriptionEl.value.trim();
-    const updatedAmount = parseFloat(editAmountEl.value);
-    const updatedType = editTransactionTypeEl.value;
-    const updatedCategory = editCategoryEl.value;
-    const updatedIsRecurring = editRecurringCheckbox.checked;
-    const updatedRecurringInterval = updatedIsRecurring ? editRecurringIntervalEl.value : null;
-
-    if (!updatedDescription || isNaN(updatedAmount)) {
-        showNotification('Please enter valid description and amount', 'error');
-        return;
-    }
-
-    // Get the current transaction
-    const currentTransaction = transactions[editIndex];
-
-    // Prepare the updated transaction
-    const updatedTransaction = {
-        ...currentTransaction,
-        description: updatedDescription,
-        amount: updatedAmount,
-        type: updatedType,
-        category: updatedCategory,
-        isRecurring: updatedIsRecurring,
-        recurringInterval: updatedRecurringInterval,
-    };
-
-    // If changing from non-recurring to recurring, add necessary properties
-    if (updatedIsRecurring && !currentTransaction.isRecurring) {
-        updatedTransaction.initialAmount = updatedAmount;
-        updatedTransaction.lastAddedDate = new Date().toISOString();
-    }
-
-    // If changing from recurring to non-recurring, remove recurring-specific properties
-    if (!updatedIsRecurring && currentTransaction.isRecurring) {
-        delete updatedTransaction.initialAmount;
-        delete updatedTransaction.lastAddedDate;
-        delete updatedTransaction.recurringInterval;
-    }
-
-    // Update the transaction in the array
-    transactions[editIndex] = updatedTransaction;
-
-    // Save updated transactions to localStorage
-    localStorage.setItem('transactions', JSON.stringify(transactions));
-
-    // Update the UI and charts
-    updateUI();
-    closeEditModal();
-
-    // Show appropriate notification
-    if (!currentTransaction.isRecurring && updatedIsRecurring) {
-        showNotification('Transaction updated and set to recurring!', 'success');
-    } else if (currentTransaction.isRecurring && !updatedIsRecurring) {
-        showNotification('Transaction updated and set to non-recurring!', 'success');
-    } else {
-        showNotification('Transaction updated successfully!', 'success');
-    }
 }
 
 function closeEditModal() {
@@ -224,6 +182,9 @@ function saveEditedTransaction() {
     const updatedIsRecurring = editRecurringCheckbox.checked;
     const updatedRecurringInterval = updatedIsRecurring ? editRecurringIntervalEl.value : null;
 
+    const updatedTransactionDate = document.getElementById('edit-transaction-date').value || transactions[editIndex].timestamp; // Keep existing date if not edited
+
+
     if (!updatedDescription || isNaN(updatedAmount)) {
         showNotification('Please enter valid description and amount', 'error');
         return;
@@ -238,6 +199,7 @@ function saveEditedTransaction() {
         category: updatedCategory,
         isRecurring: updatedIsRecurring,
         recurringInterval: updatedRecurringInterval,
+        timestamp: new Date(updatedTransactionDate).toISOString() // Update the date
     };
 
     // Save updated transactions to localStorage
@@ -248,7 +210,6 @@ function saveEditedTransaction() {
     closeEditModal();
     showNotification('Transaction updated successfully!', 'success');
 }
-
 
 function updateExpenseCategoryChart() {
     const chartCanvas = document.getElementById('expenseCategoryChart');
@@ -345,7 +306,6 @@ function updateExpenseCategoryChart() {
     });
 
 }
-
 
 // Open the modal when clicking "Edit"
 function editTransaction(index) {
@@ -499,7 +459,6 @@ function updateChart() {
 
 }
 
-
 function handleDarkModeToggle() {
     const darkModeIcon = document.getElementById('dark-mode-toggle');
 
@@ -526,6 +485,7 @@ function enableDarkMode() {
     localStorage.setItem('darkMode', 'enabled');
     updateChart();
     updateExpenseCategoryChart();
+    updateIncomeExpenseTrendsChart();
 }
 
 function disableDarkMode() {
@@ -533,11 +493,11 @@ function disableDarkMode() {
     localStorage.setItem('darkMode', 'disabled');
     updateChart();
     updateExpenseCategoryChart();
+    updateIncomeExpenseTrendsChart();
 }
 
 handleDarkModeToggle();
 updateChart();
-
 
 // Function to dynamically update the categories based on transaction type
 function updateCategoryOptions() {
@@ -560,8 +520,6 @@ function updateCategoryOptions() {
 
 // Call the function initially to populate the categories when the page loads
 updateCategoryOptions();
-
-
 
 function scrollToAddTransaction() {
     const addTransactionForm = document.querySelector('.transaction-form');
@@ -682,8 +640,8 @@ function updateUI() {
 
     updateChart();
     updateExpenseCategoryChart();
+    updateIncomeExpenseTrendsChart();
 }
-
 
 // Function to edit a transaction
 function editTransaction(index) {
@@ -699,6 +657,9 @@ function addTransaction() {
     const isRecurring = recurringCheckbox.checked;
     const recurringInterval = isRecurring ? recurringIntervalEl.value : null;
 
+    const transactionDate = document.getElementById('transaction-date').value || new Date().toISOString().split('T')[0]; // Default to today's date if not selected
+
+
     // Show modal if description or amount is invalid
     if (!description || isNaN(amount)) {
         showModal();
@@ -713,8 +674,8 @@ function addTransaction() {
         category,
         isRecurring,
         recurringInterval,
-        lastAddedDate: isRecurring ? new Date().toISOString() : null,
-        timestamp: new Date().toISOString()
+        timestamp: new Date(transactionDate).toISOString(),
+        lastAddedDate: isRecurring ? new Date().toISOString() : null
     };
 
     transactions.push(transaction);
@@ -724,6 +685,7 @@ function addTransaction() {
     // Clear form fields
     descriptionEl.value = '';
     amountEl.value = '';
+    document.getElementById('transaction-date').value = ''; // Clear date input
     recurringCheckbox.checked = false;
     recurringIntervalEl.disabled = true;
     recurringIntervalEl.value = 'monthly';
@@ -860,7 +822,6 @@ function processRecurringTransactions() {
     }
 }
 
-
 function showNotification(message, type = 'success') {
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
@@ -996,8 +957,6 @@ function exportToJSON() {
     showNotification('JSON exported successfully!', 'success');
 }
 
-
-
 // Function to import transactions from CSV
 function importFromCSV(event) {
     const file = event.target.files[0];
@@ -1055,17 +1014,11 @@ function importFromCSV(event) {
     reader.readAsText(file);
 }
 
-
-
-
 // Add event listener for PDF export button
 document.getElementById('export-pdf-btn').addEventListener('click', exportToPDF);
 
-
-
 // Add event listener for Excel export button
 document.getElementById('export-excel-btn').addEventListener('click', exportToExcel);
-
 
 function importFromExcel(event) {
     const file = event.target.files[0];
@@ -1127,8 +1080,6 @@ document.getElementById('import-excel-btn').addEventListener('click', () => {
 });
 document.getElementById('excel-file').addEventListener('change', importFromExcel);
 
-
-
 // Function to import transactions from JSON
 function importFromJSON(event) {
     const file = event.target.files[0];
@@ -1175,14 +1126,12 @@ function importFromJSON(event) {
     reader.readAsText(file);
 }
 
-
 // Add event listeners for JSON import/export buttons
 document.getElementById('export-json-btn').addEventListener('click', exportToJSON);
 document.getElementById('import-json-btn').addEventListener('click', () => {
     document.getElementById('json-file').click();
 });
 document.getElementById('json-file').addEventListener('change', importFromJSON);
-
 
 // Add the notification animations
 const style = document.createElement('style');
@@ -1427,7 +1376,6 @@ document.addEventListener('DOMContentLoaded', function () {
     updateUI();
 });
 
-
 window.onload = function () {
     // Clear all form fields on page load
     descriptionEl.value = '';
@@ -1474,7 +1422,6 @@ function formatAmount(amount) {
         maximumFractionDigits: 2
     })}`;
 }
-
 
 // Call updateCurrencySymbols on page load to apply the correct currency
 document.addEventListener('DOMContentLoaded', function () {
@@ -1571,8 +1518,124 @@ function showNoExportModal(exportType) {
     }, 3000); // Auto-close after 3 seconds
 }
 
-
 document.getElementById('export-csv-btn').addEventListener('click', exportToCSV);
 document.getElementById('export-pdf-btn').addEventListener('click', exportToPDF);
 document.getElementById('export-excel-btn').addEventListener('click', exportToExcel);
 document.getElementById('export-json-btn').addEventListener('click', exportToJSON);
+
+function updateIncomeExpenseTrendsChart() {
+    const chartCanvas = document.getElementById('incomeExpenseTrendsChart');
+    const noDataMessage = document.getElementById('no-data-trends');
+    const ctx = chartCanvas.getContext('2d');
+
+    if (transactions.length === 0) {
+        chartCanvas.style.display = 'none';
+        noDataMessage.style.display = 'block';
+        return;
+    } else {
+        chartCanvas.style.display = 'block';
+        noDataMessage.style.display = 'none';
+    }
+
+    const incomeTransactions = transactions.filter(transaction => transaction.type === 'income');
+    const expenseTransactions = transactions.filter(transaction => transaction.type === 'expense');
+
+    // Group transactions by date (e.g., daily)
+    const groupedData = groupTransactionsByDate(transactions);
+
+    const dates = Object.keys(groupedData).sort((a, b) => new Date(a) - new Date(b));
+    const incomeData = dates.map(date => groupedData[date].income || 0);
+    const expenseData = dates.map(date => groupedData[date].expenses || 0);
+
+    // Check if the chart already exists and is a Chart instance, then destroy it
+    if (window.incomeExpenseTrendsChart && window.incomeExpenseTrendsChart instanceof Chart) {
+        window.incomeExpenseTrendsChart.destroy();
+    }
+
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    const textColor = isDarkMode ? '#ffffff' : '#2d3748'; // Darker text for light mode
+    const backgroundColor = isDarkMode ? '#2d3748' : '#f7fafc'; // A light grey background for light mode
+    const gridLineColor = isDarkMode ? '#4a5568' : '#cbd5e0'; // Darker grid for light mode
+
+    // Set the background of the canvas
+    chartCanvas.style.backgroundColor = backgroundColor;
+
+    const symbol = currencySymbols[currentCurrency];
+
+    // Create a new Chart instance
+    window.incomeExpenseTrendsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [
+                {
+                    label: `Income (${symbol})`,
+                    data: incomeData,
+                    borderColor: 'rgba(75, 192, 192, 1)', // Color for income line
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)', // Slight fill
+                    fill: true,
+                    tension: 0.1
+                },
+                {
+                    label: `Expenses (${symbol})`,
+                    data: expenseData,
+                    borderColor: 'rgba(229, 62, 62, 1)', // Color for expense line
+                    backgroundColor: 'rgba(229, 62, 62, 0.2)', // Slight fill
+                    fill: true,
+                    tension: 0.1
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: textColor // Adjust text color for light/dark mode
+                    },
+                    grid: {
+                        color: gridLineColor // Adjust grid color for light/dark mode
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: textColor // Adjust text color for light/dark mode
+                    },
+                    grid: {
+                        color: gridLineColor // Adjust grid color for light/dark mode
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        color: textColor // Adjust text color for light/dark mode
+                    }
+                }
+            },
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+function groupTransactionsByDate(transactions) {
+    const groupedData = {};
+
+    transactions.forEach(transaction => {
+        const date = new Date(transaction.timestamp).toISOString().split('T')[0]; // Get the date in YYYY-MM-DD format
+
+        if (!groupedData[date]) {
+            groupedData[date] = { income: 0, expenses: 0 };
+        }
+
+        if (transaction.type === 'income') {
+            groupedData[date].income += transaction.amount;
+        } else if (transaction.type === 'expense') {
+            groupedData[date].expenses += transaction.amount;
+        }
+    });
+
+    return groupedData;
+}

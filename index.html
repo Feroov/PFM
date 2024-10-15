@@ -15,274 +15,306 @@
 </head>
 
 <body>
-    <div class="navbar">
-        <div class="navbar-logo">
-            <img src="./assets/img/logo.png" alt="Logo" class="logo">
-        </div>
-        <div class="navbar-options">
-            <!-- Dark Mode Toggle -->
-            <i id="dark-mode-toggle" class="fas fa-moon" aria-label="Toggle dark mode"></i>
-
-            <!-- Options Button with Currency Popup -->
-            <div class="options-container">
-                <i id="options-toggle" class="fas fa-cog" aria-label="Options"></i>
-                <!-- Currency Selector Pop-up -->
-                <div id="currency-popup" class="currency-popup">
-                    <button id="currency-usd" class="currency-btn" aria-label="Switch to USD">
-                        <i class="fas fa-dollar-sign"></i>
-                    </button>
-                    <button id="currency-eur" class="currency-btn" aria-label="Switch to EUR">
-                        <i class="fas fa-euro-sign"></i>
-                    </button>
-                    <button id="currency-gbp" class="currency-btn" aria-label="Switch to GBP">
-                        <i class="fas fa-pound-sign"></i>
-                    </button>
-                    <button id="info" class="currency-btn">
-                        <i class="fas fa-info-circle"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div id="info-popup" class="info-popup">
-            <div class="info-content">
-                <h2>PFM - Personal Finance Manager</h2>
-                <p><strong>Version:</strong> 1.0.0</p>
-                <p>At <strong>FeroBYTE</strong>, our mission is to simplify personal finance management, helping you stay in control of your financial health. Our app is designed to give you powerful tools to track your finances, gain insights, and make informed decisions effortlessly.</p>
-
-                <h3>Our Key Features:</h3>
-                <ul>
-                    <li><strong>Transaction Tracking:</strong> Categorize your income and expenses to get a detailed view of your finances.</li>
-                    <li><strong>Recurring Transactions:</strong> Automate your regular payments or income with recurring transactions.</li>
-                    <li><strong>Data Export:</strong> Easily export your transaction history to <strong>CSV, PDF, or Excel</strong> formats for further analysis or reporting.</li>
-                    <li><strong>Data Import:</strong> Seamlessly import transaction data from <strong>CSV, JSON, or Excel</strong> files, keeping all your financial information in one place.</li>
-                    <li><strong>Financial Insights:</strong> Visualize your data with interactive <strong>charts and reports</strong> to better understand your spending patterns.</li>
-                    <li><strong>Dark and Light Modes:</strong> Customize your app experience with light and dark mode themes for comfortable viewing.</li>
-                    <li><strong>Multi-Currency Support:</strong> Manage your transactions in different currencies, including <strong>USD, EUR, and GBP</strong>.</li>
-                </ul>
-
-                <button id="close-info" class="close-btn" aria-label="Close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
+    <div class="loader-overlay"></div>
+    <div class="loader">
+        <img src="./assets/img/logo.png" alt="Logo" class="loader-logo">
+        <div class="slice"></div>
+        <div class="slice"></div>
+        <div class="slice"></div>
+        <div class="slice"></div>
+        <div class="slice"></div>
+        <div class="slice"></div>
     </div>
-
-    <div class="container">
-        <div class="dashboard-grid">
-            <div class="card balance-card">
-                <h2 id="balanceEl">Current Balance</h2>
-                <div class="balance-amount"><span id="balance">0</span></div>
+    
+    <div id="content">
+        <div class="navbar">
+            <div class="navbar-logo">
+                <img src="./assets/img/logo.png" alt="Logo" class="logo">
             </div>
-
-            <div class="income-expense-container">
-                <div class="stat-card income">
-                    <h3 id="incomeTotalEl">Income</h3>
-                    <div class="stat-amount"><span id="income-total">0</span></div>
+            <div class="navbar-options">
+                <!-- Dark Mode Toggle -->
+                <i id="dark-mode-toggle" class="fas fa-moon" aria-label="Toggle dark mode"></i>
+    
+                <!-- Options Button with Currency Popup -->
+                <div class="options-container">
+                    <i id="options-toggle" class="fas fa-cog" aria-label="Options"></i>
+                    <!-- Currency Selector Pop-up -->
+                    <div id="currency-popup" class="currency-popup">
+                        <button id="currency-usd" class="currency-btn" aria-label="Switch to USD">
+                            <i class="fas fa-dollar-sign"></i>
+                        </button>
+                        <button id="currency-eur" class="currency-btn" aria-label="Switch to EUR">
+                            <i class="fas fa-euro-sign"></i>
+                        </button>
+                        <button id="currency-gbp" class="currency-btn" aria-label="Switch to GBP">
+                            <i class="fas fa-pound-sign"></i>
+                        </button>
+                        <button id="info" class="currency-btn">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="stat-card expense">
-                    <h3 id="expenseTotalEl">Expenses</h3>
-                    <div class="stat-amount"><span id="expense-total">0</span></div>
+            </div>
+    
+            <div id="info-popup" class="info-popup">
+                <div class="info-content">
+                    <h2>PFM - Personal Finance Manager</h2>
+                    <p><strong>Version:</strong> 1.0.0</p>
+                    <p>At <strong>FeroBYTE</strong>, our mission is to simplify personal finance management, helping you stay in control of your financial health. Our app is designed to give you powerful tools to track your finances, gain insights, and make informed decisions effortlessly.</p>
+    
+                    <h3>Our Key Features:</h3>
+                    <ul>
+                        <li><strong>Transaction Tracking:</strong> Categorize your income and expenses to get a detailed view of your finances.</li>
+                        <li><strong>Recurring Transactions:</strong> Automate your regular payments or income with recurring transactions.</li>
+                        <li><strong>Data Export:</strong> Easily export your transaction history to <strong>CSV, PDF, or Excel</strong> formats for further analysis or reporting.</li>
+                        <li><strong>Data Import:</strong> Seamlessly import transaction data from <strong>CSV, JSON, or Excel</strong> files, keeping all your financial information in one place.</li>
+                        <li><strong>Financial Insights:</strong> Visualize your data with interactive <strong>charts and reports</strong> to better understand your spending patterns.</li>
+                        <li><strong>Dark and Light Modes:</strong> Customize your app experience with light and dark mode themes for comfortable viewing.</li>
+                        <li><strong>Multi-Currency Support:</strong> Manage your transactions in different currencies, including <strong>USD, EUR, and GBP</strong>.</li>
+                    </ul>
+    
+                    <button id="close-info" class="close-btn" aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             </div>
         </div>
-
-        <div class="transaction-container">
-            <div class="transaction-form card">
-                <h2 id="addTransactionBtn">Add New Transaction</h2>
-                <div class="form-grid">
-                    <div class="input-group">
-                        <label id="descriptionElLabel" for="description">Description</label>
-                        <input type="text" id="description" placeholder="Enter description">
+    
+        <div class="container">
+            <div class="dashboard-grid">
+                <div class="card balance-card">
+                    <h2 id="balanceEl">Current Balance</h2>
+                    <div class="balance-amount"><span id="balance">0</span></div>
+                </div>
+    
+                <div class="income-expense-container">
+                    <div class="stat-card income">
+                        <h3 id="incomeTotalEl">Income</h3>
+                        <div class="stat-amount"><span id="income-total">0</span></div>
                     </div>
-                    <div class="input-group">
-                        <label id="amountElLabel" for="amount">Amount</label>
-                        <input type="number" id="amount" placeholder="Enter amount">
-                    </div>
-                    <div class="input-group">
-                        <label id="transactionTypeElLabel" for="transaction-type">Type</label>
-                        <select id="transaction-type" onchange="updateCategoryOptions()">
-                            <option value="income">Income</option>
-                            <option value="expense">Expense</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label id="categoryElLabel" for="category">Category</label>
-                        <select id="category"></select>
-                    </div>
-
-                    <div class="input-group checkbox-group">
-                        <label id="recurringCheckboxLabel" for="recurring-checkbox">Recurring?</label>
-                        <div class="checkbox-wrapper">
-                            <input type="checkbox" id="recurring-checkbox">
-                            <select id="recurring-interval" disabled>
-                                <option value="daily">Daily</option>
-                                <option value="weekly">Weekly</option>
-                                <option value="monthly">Monthly</option>
-                            </select>
-                        </div>
+                    <div class="stat-card expense">
+                        <h3 id="expenseTotalEl">Expenses</h3>
+                        <div class="stat-amount"><span id="expense-total">0</span></div>
                     </div>
                 </div>
-
-                <div id="errorModal" class="custom-modal" style="display: none;">
-                    <div class="modal-content">
-                        <div class="modal-icon">
-                            <i class="fas fa-info-circle"></i>
-                        </div>
-                        <h2>Error</h2>
-                        <p>Please enter a valid description and amount.</p>
-                        <button id="close-error-modal" class="btn btn-primary">OK</button>
-                    </div>
-                </div>
-
-                <button id="add-transaction-btn" class="btn btn-primary">Add Transaction</button>
             </div>
-
-            <div class="transaction-list card">
-                <div id="editModal" class="modal" style="display: none;">
-                    <div class="modal-content">
-                        <h2>Edit Transaction</h2>
-                        <div class="form-group">
-                            <label for="edit-description">Description</label>
-                            <input type="text" id="edit-description" placeholder="Enter description">
+    
+            <div class="transaction-container">
+                <div class="transaction-form card">
+                    <h2 id="addTransactionBtn">Add New Transaction</h2>
+                    <br>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label id="descriptionElLabel" for="description">Description</label>
+                            <input type="text" id="description" placeholder="Enter description">
                         </div>
-                        <div class="form-group">
-                            <label for="edit-amount">Amount</label>
-                            <input type="number" id="edit-amount" placeholder="Enter amount">
+                        <div class="input-group">
+                            <label id="amountElLabel" for="amount">Amount</label>
+                            <input type="number" id="amount" placeholder="Enter amount">
                         </div>
-                        <div class="form-group">
-                            <label for="edit-transaction-type">Type</label>
-                            <select id="edit-transaction-type">
+                        <div class="input-group">
+                            <label id="transactionTypeElLabel" for="transaction-type">Type</label>
+                            <select id="transaction-type" onchange="updateCategoryOptions()">
                                 <option value="income">Income</option>
                                 <option value="expense">Expense</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="edit-category">Category</label>
-                            <select id="edit-category"></select>
+                        <div class="input-group">
+                            <label id="categoryElLabel" for="category">Category</label>
+                            <select id="category"></select>
                         </div>
-                        <div class="form-group recurring-section">
-                            <div class="recurring-interval">
-                                <div class="checkbox-group">
-                                    <label for="edit-recurring-checkbox">Make this a recurring transaction?</label>
-                                    <input type="checkbox" id="edit-recurring-checkbox">
-                                </div>
-                                <select id="edit-recurring-interval" disabled>
+    
+                        <div class="input-group checkbox-group">
+                            <label id="recurringCheckboxLabel" for="recurring-checkbox">Recurring?</label>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="recurring-checkbox">
+                                <select id="recurring-interval" disabled>
                                     <option value="daily">Daily</option>
                                     <option value="weekly">Weekly</option>
                                     <option value="monthly">Monthly</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="modal-buttons">
-                            <button onclick="saveEditedTransaction()" class="save-btn">Save Changes</button>
-                            <button onclick="closeEditModal()" class="cancel-btn">Cancel</button>
+                        <div class="input-group">
+                            <label for="transaction-date">Date</label>
+                            <input type="date" id="transaction-date" placeholder="Select date">
+                        </div>
+                    </div>
+    
+                    <div id="errorModal" class="custom-modal" style="display: none;">
+                        <div class="modal-content">
+                            <div class="modal-icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <h2>Error</h2>
+                            <p>Please enter a valid description and amount.</p>
+                            <button id="close-error-modal" class="btn btn-primary">OK</button>
+                        </div>
+                    </div>
+    
+                    <button id="add-transaction-btn" class="btn btn-primary">Add Transaction</button>
+                </div>
+    
+                <div class="transaction-list card">
+                    <div id="editModal" class="modal" style="display: none;">
+                        <div class="modal-content">
+                            <h2>Edit Transaction</h2>
+                            <div class="form-group">
+                                <label for="edit-description">Description</label>
+                                <input type="text" id="edit-description" placeholder="Enter description">
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-amount">Amount</label>
+                                <input type="number" id="edit-amount" placeholder="Enter amount">
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-transaction-type">Type</label>
+                                <select id="edit-transaction-type">
+                                    <option value="income">Income</option>
+                                    <option value="expense">Expense</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-category">Category</label>
+                                <select id="edit-category"></select>
+                            </div>
+                            <div class="form-group recurring-section">
+                                <div class="recurring-interval">
+                                    <div class="checkbox-group">
+                                        <label for="edit-recurring-checkbox">Make this a recurring transaction?</label>
+                                        <input type="checkbox" id="edit-recurring-checkbox">
+                                    </div>
+                                    <select id="edit-recurring-interval" disabled>
+                                        <option value="daily">Daily</option>
+                                        <option value="weekly">Weekly</option>
+                                        <option value="monthly">Monthly</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-transaction-date">Date</label>
+                                <input type="date" id="edit-transaction-date" placeholder="Select date">
+                            </div>
+                            
+                            <div class="modal-buttons">
+                                <button onclick="saveEditedTransaction()" class="save-btn">Save Changes</button>
+                                <button onclick="closeEditModal()" class="cancel-btn">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div class="list-header">
+                        <h2 id="transactionHistoryTitle">Transaction History</h2>
+                        <button id="delete-all-btn" class="btn btn-danger" aria-label="Delete All Transactions">
+                            <i class="fas fa-trash-alt"></i> <span id="deleteAllBtn">Delete All</span>
+                        </button>
+                    </div>
+    
+                    <div class="filter-group">
+                        <label for="category-filter">Filter by Category</label>
+                        <select id="category-filter">
+                            <option value="all">All Categories</option>
+                            <option value="Salary">Salary</option>
+                            <option value="Food">Food</option>
+                            <option value="Rent">Rent</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+    
+                    <div id="transaction-list" class="transaction-items"></div>
+                    <p id="no-transactions-message" class="no-entries" style="display:none;">No items found.</p>
+                </div>
+    
+                <div class="csv-actions card">
+                    <h2 id="exportData">Data Management</h2>
+                    <div class="data-management-container">
+                        <div class="import-section">
+                            <h3 id="importData">Import Data</h3>
+                            <div class="import-buttons">
+                                <button id="import-csv-btn" class="btn btn-outline">
+                                    <input type="file" id="csv-file" accept=".csv" class="file-input">
+                                    <i class="fa-solid fa-file-csv"></i><span id="csvBtn">CSV</span>
+                                </button>
+    
+                                <button id="import-excel-btn" class="btn btn-outline">
+                                    <input type="file" id="excel-file" accept=".xlsx, .xls" class="file-input">
+                                    <i class="fas fa-file-excel"></i><span id="excelBtn">Excel</span>
+                                </button>
+    
+                                <button id="import-json-btn" class="btn btn-outline">
+                                    <input type="file" id="json-file" accept=".json" class="file-input">
+                                    <i class="fas fa-file-code"></i><span id="jsonBtn">JSON</span>
+                                </button>
+                            </div>
+                        </div>
+    
+                        <div class="export-section">
+                            <h3 id="exportDataTitle">Export Data</h3> 
+                            <div class="export-buttons">
+                                <button id="export-csv-btn" class="btn btn-outline">
+                                    <i class="fa-solid fa-file-csv"></i><span id="csvExportBtn">CSV</span> 
+                                </button>
+    
+                                <button id="export-excel-btn" class="btn btn-outline">
+                                    <i class="fas fa-file-excel"></i><span id="excelExportBtn">Excel</span> 
+                                </button>
+    
+                                <button id="export-pdf-btn" class="btn btn-outline">
+                                    <i class="fas fa-file-pdf"></i><span id="pdfExportBtn">PDF</span> 
+                                </button>
+    
+                                <button id="export-json-btn" class="btn btn-outline">
+                                    <i class="fas fa-file-code"></i><span id="jsonExportBtn">JSON</span> 
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="list-header">
-                    <h2 id="transactionHistoryTitle">Transaction History</h2>
-                    <button id="delete-all-btn" class="btn btn-danger" aria-label="Delete All Transactions">
-                        <i class="fas fa-trash-alt"></i> <span id="deleteAllBtn">Delete All</span>
-                    </button>
-                </div>
-
-                <div class="filter-group">
-                    <label for="category-filter">Filter by Category</label>
-                    <select id="category-filter">
-                        <option value="all">All Categories</option>
-                        <option value="Salary">Salary</option>
-                        <option value="Food">Food</option>
-                        <option value="Rent">Rent</option>
-                        <option value="Entertainment">Entertainment</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-
-                <div id="transaction-list" class="transaction-items"></div>
-                <p id="no-transactions-message" class="no-entries" style="display:none;">No items found.</p>
+    
+                <input type="file" id="xml-file" accept=".xml" class="file-input" style="display: none;">
             </div>
-
-            <div class="csv-actions card">
-                <h2 id="exportData">Data Management</h2>
-                <div class="data-management-container">
-                    <div class="import-section">
-                        <h3 id="importData">Import Data</h3>
-                        <div class="import-buttons">
-                            <button id="import-csv-btn" class="btn btn-outline">
-                                <input type="file" id="csv-file" accept=".csv" class="file-input">
-                                <i class="fa-solid fa-file-csv"></i><span id="csvBtn">CSV</span>
-                            </button>
-
-                            <button id="import-excel-btn" class="btn btn-outline">
-                                <input type="file" id="excel-file" accept=".xlsx, .xls" class="file-input">
-                                <i class="fas fa-file-excel"></i><span id="excelBtn">Excel</span>
-                            </button>
-
-                            <button id="import-json-btn" class="btn btn-outline">
-                                <input type="file" id="json-file" accept=".json" class="file-input">
-                                <i class="fas fa-file-code"></i><span id="jsonBtn">JSON</span>
-                            </button>
-                        </div>
+    
+            <div class="chart-row">
+                <div class="chart-container card">
+                    <h2 id="incomeVsExpensesTitle">Income vs Expenses</h2> 
+                    <div id="no-data-income-expenses" class="no-data-message" style="display: none;">
+                        No data found.
                     </div>
-
-                    <div class="export-section">
-                        <h3 id="exportDataTitle">Export Data</h3> <!-- Translatable -->
-                        <div class="export-buttons">
-                            <button id="export-csv-btn" class="btn btn-outline">
-                                <i class="fa-solid fa-file-csv"></i><span id="csvExportBtn">CSV</span> <!-- Translatable -->
-                            </button>
-
-                            <button id="export-excel-btn" class="btn btn-outline">
-                                <i class="fas fa-file-excel"></i><span id="excelExportBtn">Excel</span> <!-- Translatable -->
-                            </button>
-
-                            <button id="export-pdf-btn" class="btn btn-outline">
-                                <i class="fas fa-file-pdf"></i><span id="pdfExportBtn">PDF</span> <!-- Translatable -->
-                            </button>
-
-                            <button id="export-json-btn" class="btn btn-outline">
-                                <i class="fas fa-file-code"></i><span id="jsonExportBtn">JSON</span> <!-- Translatable -->
-                            </button>
-                        </div>
+                    <br>
+                    <canvas id="transactionChart" height="400"></canvas>
+                </div>
+                <div class="chart-container card">
+                    <h2 id="expensesBreakdownTitle">Expenses Breakdown by Category</h2> 
+                    <div id="no-data-expenses-category" class="no-data-message" style="display: none;">
+                        No data found.
                     </div>
+                    <br>
+                    <canvas id="expenseCategoryChart"></canvas>
+                </div>
+                <div class="chart-container card">
+                    <h2>Income and Expense Trends</h2> <!-- New section for trends -->
+                    <div id="no-data-trends" class="no-data-message" style="display: none;">
+                        No data found.
+                    </div>
+                    <br>
+                    <canvas id="incomeExpenseTrendsChart" height="400"></canvas> <!-- New canvas for trends -->
                 </div>
             </div>
-
-            <input type="file" id="xml-file" accept=".xml" class="file-input" style="display: none;">
+            <br><br>
         </div>
-
-        <div class="chart-row">
-            <div class="chart-container card">
-                <h2 id="incomeVsExpensesTitle">Income vs Expenses</h2> <!-- Translatable -->
-                <div id="no-data-income-expenses" class="no-data-message" style="display: none;">
-                    No data found.
+    
+        <div id="no-export-modal" class="custom-modal" style="display:none;">
+            <div class="modal-content">
+                <h2 id="exportFailedTitle">Export Failed</h2> 
+                <p id="no-export-modal-text">No transactions available to export.</p> 
+                <div class="modal-buttons">
+                    <button id="close-no-export-modal" class="btn btn-primary">OK</button> 
                 </div>
-                <br>
-                <canvas id="transactionChart" height="400"></canvas>
-            </div>
-            <div class="chart-container card">
-                <h2 id="expensesBreakdownTitle">Expenses Breakdown by Category</h2> <!-- Translatable -->
-                <div id="no-data-expenses-category" class="no-data-message" style="display: none;">
-                    No data found.
-                </div>
-                <br>
-                <canvas id="expenseCategoryChart"></canvas>
             </div>
         </div>
-        <br><br>
     </div>
 
-    <div id="no-export-modal" class="custom-modal" style="display:none;">
-        <div class="modal-content">
-            <h2 id="exportFailedTitle">Export Failed</h2> <!-- Translatable -->
-            <p id="no-export-modal-text">No transactions available to export.</p> <!-- Translatable -->
-            <div class="modal-buttons">
-                <button id="close-no-export-modal" class="btn btn-primary">OK</button> <!-- Translatable -->
-            </div>
-        </div>
-    </div>
 
     <script src="./assets/js/app.js"></script>
 </body>

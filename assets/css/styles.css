@@ -52,7 +52,7 @@
 
 .dark-mode .recurring-icon,
 .dark-mode .recurring-text {
-    color: #a2dee4; 
+    color: #a2dee4;
 }
 
 .dark-mode .transaction-item .recurring-icon {
@@ -179,7 +179,8 @@ body {
     scrollbar-width: none;
 }
 
-html::-webkit-scrollbar, body::-webkit-scrollbar {
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
     display: none;
 }
 
@@ -218,9 +219,11 @@ body {
 
 .import-section,
 .export-section {
-    padding: 1rem 1.5rem;
+    padding: 1rem 1rem;
     border-radius: 0.75rem;
     border: 1px solid var(--border-color);
+    height: 200px;
+    align-content: center;
 }
 
 .import-section h3,
@@ -495,7 +498,7 @@ select:focus {
     flex-direction: column;
     overflow-x: hidden;
     gap: 0.75rem;
-    max-height: 300px;
+    max-height: 360px;
     overflow-y: auto;
     scrollbar-width: auto;
     scrollbar-color: #888 #f1f1f1;
@@ -816,13 +819,13 @@ canvas {
     .chart-container {
         max-width: 100%;
     }
-    
+
     .balance-card h2 {
         font-size: 1.25rem;
         opacity: 0.9;
         text-align: center;
     }
-    
+
     .balance-amount {
         font-size: 2.5rem;
         font-weight: 700;
@@ -888,6 +891,7 @@ canvas {
 .modal-content .close-button:hover {
     color: #dc3545;
 }
+
 .close {
     position: absolute;
     top: 10px;
@@ -1139,9 +1143,15 @@ textarea {
     animation: spin 1s linear infinite;
     margin-bottom: 1rem;
 }
+
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .transaction-list {
@@ -1154,14 +1164,22 @@ textarea {
 }
 
 @keyframes fadeOut {
-    from { opacity: 1; transform: translateX(0); }
-    to { opacity: 0; transform: translateX(100%); }
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
 }
 
 @keyframes modalFadeIn {
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -1172,6 +1190,7 @@ textarea {
         transform: scale(0.8);
         opacity: 0;
     }
+
     to {
         transform: scale(1);
         opacity: 1;
@@ -1183,6 +1202,7 @@ textarea {
         transform: scale(1);
         opacity: 1;
     }
+
     to {
         transform: scale(0.8);
         opacity: 0;
@@ -1194,12 +1214,15 @@ textarea {
         transform: scale(0.3);
         opacity: 0;
     }
+
     50% {
         transform: scale(1.1);
     }
+
     70% {
         transform: scale(0.9);
     }
+
     100% {
         transform: scale(1);
         opacity: 1;
@@ -1224,10 +1247,12 @@ textarea {
 .custom-modal.fade-out {
     opacity: 0;
 }
+
 @keyframes fadeIn {
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1239,6 +1264,7 @@ textarea {
         opacity: 1;
         transform: translateY(0);
     }
+
     to {
         opacity: 0;
     }
@@ -1301,6 +1327,7 @@ textarea {
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1351,7 +1378,8 @@ textarea {
 
 @media (max-width: 768px) {
     #no-transactions-message {
-        top: 85%;  /* Adjust to 85% for smaller screens */
+        top: 85%;
+        /* Adjust to 85% for smaller screens */
     }
 }
 
@@ -1424,9 +1452,9 @@ textarea {
 #editModal select {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid var(--border-color); 
-    border-radius: 0.5rem; 
-    background-color: var(--card-background); 
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background-color: var(--card-background);
     color: var(--text-primary);
     transition: border-color 0.15s ease;
 }
@@ -1507,6 +1535,7 @@ textarea {
         transform: scale(0.95);
         opacity: 0;
     }
+
     to {
         transform: scale(1);
         opacity: 1;
@@ -1517,11 +1546,11 @@ textarea {
     #editModal .modal-content {
         padding: 1.5rem;
     }
-    
+
     #editModal .modal-buttons {
         flex-direction: column;
     }
-    
+
     #editModal .modal-buttons button {
         width: 100%;
     }
@@ -1534,9 +1563,9 @@ textarea {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     text-align: center;
 
-    width: 80%; 
-    max-width: 400px; 
-    height: auto; 
+    width: 80%;
+    max-width: 400px;
+    height: auto;
     min-height: 250px;
 
     display: flex;
@@ -1615,13 +1644,13 @@ textarea {
         font-size: 1rem;
         opacity: 0.9;
     }
-    
+
     .stat-amount {
         font-size: 1.45rem;
         font-weight: 700;
         margin: 0.5rem 0;
     }
-    
+
 
     .income-expense-container {
         display: flex;
@@ -1633,7 +1662,7 @@ textarea {
     .card,
     .transaction-form,
     .transaction-list,
-    .data-management-container > div {
+    .data-management-container>div {
         width: 100%;
     }
 
@@ -1688,8 +1717,8 @@ textarea {
 
 .currency-popup {
     position: absolute;
-    top: calc(100% + 0.5rem); 
-    right: 50%; 
+    top: calc(100% + 0.5rem);
+    right: 50%;
     transform: translateX(50%);
     background-color: #1e2837;
     border: 1px solid #2d3748;
@@ -1798,6 +1827,7 @@ textarea {
         transform: scale(0.8) translateY(40px);
         opacity: 0;
     }
+
     100% {
         transform: scale(1) translateY(0);
         opacity: 1;
@@ -1953,6 +1983,14 @@ textarea {
 
 
 @media (max-width: 768px) {
+
+    .import-section,
+    .export-section {
+        padding: 1rem 1.5rem;
+        border-radius: 0.75rem;
+        border: 1px solid var(--border-color);
+    }
+
     .info-content {
         max-width: 90%;
         padding: 2rem;
@@ -1962,7 +2000,8 @@ textarea {
         font-size: 1.75rem;
     }
 
-    .info-content p, .info-content li {
+    .info-content p,
+    .info-content li {
         font-size: 1rem;
     }
 
@@ -1983,7 +2022,8 @@ textarea {
         font-size: 1.5rem;
     }
 
-    .info-content p, .info-content li {
+    .info-content p,
+    .info-content li {
         font-size: 0.95rem;
     }
 
@@ -2058,8 +2098,10 @@ input[type="number"] {
 
 /* Dark Mode Support */
 .dark-mode .delete-all-modal {
-    background-color: var(--card-background); /* Dark mode background */
-    color: var(--text-primary); /* Dark mode text color */
+    background-color: var(--card-background);
+    /* Dark mode background */
+    color: var(--text-primary);
+    /* Dark mode text color */
 }
 
 .dark-mode .delete-all-modal h2 {
@@ -2152,34 +2194,44 @@ input[type="number"] {
 }
 
 .dark-mode .modal-content {
-    background-color: var(--card-background); /* Card background for dark mode */
-    color: var(--text-primary); /* Text color for dark mode */
+    background-color: var(--card-background);
+    /* Card background for dark mode */
+    color: var(--text-primary);
+    /* Text color for dark mode */
 }
 
 .dark-mode .modal-content h2 {
-    color: var(--text-primary); /* Heading color */
+    color: var(--text-primary);
+    /* Heading color */
 }
 
 .dark-mode .modal-content p {
-    color: var(--text-secondary); /* Paragraph color */
+    color: var(--text-secondary);
+    /* Paragraph color */
 }
 
 .dark-mode .modal-buttons .btn-danger {
-    background-color: var(--danger-color); /* Danger button color */
-    color: white; /* Text color for buttons */
+    background-color: var(--danger-color);
+    /* Danger button color */
+    color: white;
+    /* Text color for buttons */
 }
 
 .dark-mode .modal-buttons .btn-danger:hover {
-    background-color: #c82333; /* Darker shade on hover */
+    background-color: #c82333;
+    /* Darker shade on hover */
 }
 
 .dark-mode .modal-buttons .btn-primary {
-    background-color: var(--primary-color); /* Primary button color */
-    color: white; /* Text color for primary button */
+    background-color: var(--primary-color);
+    /* Primary button color */
+    color: white;
+    /* Text color for primary button */
 }
 
 .dark-mode .modal-buttons .btn-primary:hover {
-    background-color: #1d4ed8; /* Darker shade on hover for primary button */
+    background-color: #1d4ed8;
+    /* Darker shade on hover for primary button */
 }
 
 .dark-mode .modal-content {
@@ -2201,8 +2253,10 @@ input[type="number"] {
 }
 
 .modal-buttons .btn-primary:hover {
-    background-color: #1d4ed8; /* Darker shade on hover for primary button */
+    background-color: #1d4ed8;
+    /* Darker shade on hover for primary button */
 }
+
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -2221,20 +2275,20 @@ input[type="number"] {
 .navbar-options {
     display: flex;
     align-items: center;
-    gap: 1rem; /* Added gap for spacing between elements */
 }
 
 .options-container {
     display: flex;
     align-items: center;
     position: relative;
-    gap: 0.5rem; /* Added gap for spacing between the cog and language selector */
+    gap: 0.5rem;
 }
 
 #dark-mode-toggle {
     transform: scale(1.5);
     cursor: pointer;
-    margin-right: 1rem; /* Added margin to separate it from the other items */
+    margin-right: 1rem;
+    /* Added margin to separate it from the other items */
 }
 
 #options-toggle {
@@ -2247,13 +2301,14 @@ input[type="number"] {
 
 .currency-popup {
     position: absolute;
-    top: calc(100% + 0.5rem); 
+    top: calc(100% + 0.5rem);
     right: 0;
     background-color: #1e2837;
     border: 1px solid #2d3748;
     padding: 0.5rem;
     border-radius: 0.5rem;
-    display: none; /* Initially hidden */
+    display: none;
+    /* Initially hidden */
     flex-direction: column;
     gap: 0.5rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -2287,4 +2342,267 @@ select#language-selector {
     color: var(--text-primary);
     font-size: 0.875rem;
     cursor: pointer;
+}
+
+
+.loader-logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60vw;
+    max-width: 600px;
+    min-width: 150px;
+    z-index: 1;
+    opacity: 0.05;
+}
+
+.loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgb(40, 40, 40);
+    z-index: 9998;
+    opacity: 1;
+    transition: opacity 1.5s ease-out;
+}
+
+.loader {
+    --uib-size: 150px;
+    --uib-speed: 2.5s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: var(--uib-size);
+    width: var(--uib-size);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
+}
+
+
+.loader.hidden,
+.loader-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+.slice {
+    position: relative;
+    height: calc(var(--uib-size) / 6);
+    width: 100%;
+}
+
+.slice::before,
+.slice::after {
+    --uib-a: calc(var(--uib-speed) / -2);
+    --uib-b: calc(var(--uib-speed) / -6);
+    content: "";
+    position: absolute;
+    top: 0;
+    left: calc(50% - var(--uib-size) / 12);
+    height: 100%;
+    width: calc(100% / 6);
+    border-radius: 50%;
+    background-color: var(--uib-color);
+    flex-shrink: 0;
+    animation: orbit var(--uib-speed) linear infinite;
+    transition: background-color 0.3s ease;
+}
+
+.slice:nth-child(1)::after {
+    animation-delay: var(--uib-a);
+}
+
+.slice:nth-child(2)::before {
+    animation-delay: var(--uib-b);
+}
+
+.slice:nth-child(2)::after {
+    animation-delay: calc(var(--uib-a) + var(--uib-b));
+}
+
+.slice:nth-child(3)::before {
+    animation-delay: calc(var(--uib-b) * 2);
+}
+
+.slice:nth-child(3)::after {
+    animation-delay: calc(var(--uib-a) + var(--uib-b) * 2);
+}
+
+.slice:nth-child(4)::before {
+    animation-delay: calc(var(--uib-b) * 3);
+}
+
+.slice:nth-child(4)::after {
+    animation-delay: calc(var(--uib-a) + var(--uib-b) * 3);
+}
+
+.slice:nth-child(5)::before {
+    animation-delay: calc(var(--uib-b) * 4);
+}
+
+.slice:nth-child(5)::after {
+    animation-delay: calc(var(--uib-a) + var(--uib-b) * 4);
+}
+
+.slice:nth-child(6)::before {
+    animation-delay: calc(var(--uib-b) * 5);
+}
+
+.slice:nth-child(6)::after {
+    animation-delay: calc(var(--uib-a) + var(--uib-b) * 5);
+}
+
+@keyframes orbit {
+    0% {
+        transform: translateX(calc(var(--uib-size) * 0.25)) scale(0.73684);
+        opacity: 0.65;
+    }
+
+    5% {
+        transform: translateX(calc(var(--uib-size) * 0.235)) scale(0.684208);
+        opacity: 0.58;
+    }
+
+    10% {
+        transform: translateX(calc(var(--uib-size) * 0.182)) scale(0.631576);
+        opacity: 0.51;
+    }
+
+    15% {
+        transform: translateX(calc(var(--uib-size) * 0.129)) scale(0.578944);
+        opacity: 0.44;
+    }
+
+    20% {
+        transform: translateX(calc(var(--uib-size) * 0.076)) scale(0.526312);
+        opacity: 0.37;
+    }
+
+    25% {
+        transform: translateX(0%) scale(0.47368);
+        opacity: 0.3;
+    }
+
+    30% {
+        transform: translateX(calc(var(--uib-size) * -0.076)) scale(0.526312);
+        opacity: 0.37;
+    }
+
+    35% {
+        transform: translateX(calc(var(--uib-size) * -0.129)) scale(0.578944);
+        opacity: 0.44;
+    }
+
+    40% {
+        transform: translateX(calc(var(--uib-size) * -0.182)) scale(0.631576);
+        opacity: 0.51;
+    }
+
+    45% {
+        transform: translateX(calc(var(--uib-size) * -0.235)) scale(0.684208);
+        opacity: 0.58;
+    }
+
+    50% {
+        transform: translateX(calc(var(--uib-size) * -0.25)) scale(0.73684);
+        opacity: 0.65;
+    }
+
+    55% {
+        transform: translateX(calc(var(--uib-size) * -0.235)) scale(0.789472);
+        opacity: 0.72;
+    }
+
+    60% {
+        transform: translateX(calc(var(--uib-size) * -0.182)) scale(0.842104);
+        opacity: 0.79;
+    }
+
+    65% {
+        transform: translateX(calc(var(--uib-size) * -0.129)) scale(0.894736);
+        opacity: 0.86;
+    }
+
+    70% {
+        transform: translateX(calc(var(--uib-size) * -0.076)) scale(0.947368);
+        opacity: 0.93;
+    }
+
+    75% {
+        transform: translateX(0%) scale(1);
+        opacity: 1;
+    }
+
+    80% {
+        transform: translateX(calc(var(--uib-size) * 0.076)) scale(0.947368);
+        opacity: 0.93;
+    }
+
+    85% {
+        transform: translateX(calc(var(--uib-size) * 0.129)) scale(0.894736);
+        opacity: 0.86;
+    }
+
+    90% {
+        transform: translateX(calc(var(--uib-size) * 0.182)) scale(0.842104);
+        opacity: 0.79;
+    }
+
+    95% {
+        transform: translateX(calc(var(--uib-size) * 0.235)) scale(0.789472);
+        opacity: 0.72;
+    }
+
+    100% {
+        transform: translateX(calc(var(--uib-size) * 0.25)) scale(0.73684);
+        opacity: 0.65;
+    }
+}
+
+.slice:nth-child(1)::before,
+.slice:nth-child(1)::after {
+    background-color: #3bc263;
+    /* Replaced with new hex */
+}
+
+.slice:nth-child(2)::before,
+.slice:nth-child(2)::after {
+    background-color: #fdfdfc;
+    /* Replaced with new hex */
+}
+
+.slice:nth-child(3)::before,
+.slice:nth-child(3)::after {
+    background-color: #082d40;
+    /* Replaced with new hex */
+}
+
+.slice:nth-child(4)::before,
+.slice:nth-child(4)::after {
+    background-color: #0094e6;
+    /* Replaced with new hex */
+}
+
+/* Optional: If you want to continue using all 6 slices, 
+     you can repeat the colors for the remaining slices */
+.slice:nth-child(5)::before,
+.slice:nth-child(5)::after {
+    background-color: #3bc263;
+    /* Repeating color */
+}
+
+.slice:nth-child(6)::before,
+.slice:nth-child(6)::after {
+    background-color: #fdfdfc;
+    /* Repeating color */
 }
