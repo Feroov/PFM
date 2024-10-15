@@ -41,14 +41,6 @@
                         <i class="fas fa-info-circle"></i>
                     </button>
                 </div>
-
-                <!-- Language Selector -->
-                <select id="language-selector">
-                    <option value="en">English</option>
-                    <option value="tr">Turkish</option>
-                    <option value="de">German</option>
-                    <option value="es">Spanish</option>
-                </select>
             </div>
         </div>
 
@@ -236,22 +228,22 @@
                     </div>
 
                     <div class="export-section">
-                        <h3>Export Data</h3>
+                        <h3 id="exportDataTitle">Export Data</h3> <!-- Translatable -->
                         <div class="export-buttons">
                             <button id="export-csv-btn" class="btn btn-outline">
-                                <i class="fa-solid fa-file-csv"></i><span id="csvExportBtn">CSV</span>
+                                <i class="fa-solid fa-file-csv"></i><span id="csvExportBtn">CSV</span> <!-- Translatable -->
                             </button>
 
                             <button id="export-excel-btn" class="btn btn-outline">
-                                <i class="fas fa-file-excel"></i><span id="excelExportBtn">Excel</span>
+                                <i class="fas fa-file-excel"></i><span id="excelExportBtn">Excel</span> <!-- Translatable -->
                             </button>
 
                             <button id="export-pdf-btn" class="btn btn-outline">
-                                <i class="fas fa-file-pdf"></i><span id="pdfExportBtn">PDF</span>
+                                <i class="fas fa-file-pdf"></i><span id="pdfExportBtn">PDF</span> <!-- Translatable -->
                             </button>
 
                             <button id="export-json-btn" class="btn btn-outline">
-                                <i class="fas fa-file-code"></i><span id="jsonExportBtn">JSON</span>
+                                <i class="fas fa-file-code"></i><span id="jsonExportBtn">JSON</span> <!-- Translatable -->
                             </button>
                         </div>
                     </div>
@@ -263,7 +255,7 @@
 
         <div class="chart-row">
             <div class="chart-container card">
-                <h2 id="incomeVsExpensesTitle">Income vs Expenses</h2>
+                <h2 id="incomeVsExpensesTitle">Income vs Expenses</h2> <!-- Translatable -->
                 <div id="no-data-income-expenses" class="no-data-message" style="display: none;">
                     No data found.
                 </div>
@@ -271,7 +263,7 @@
                 <canvas id="transactionChart" height="400"></canvas>
             </div>
             <div class="chart-container card">
-                <h2 id="expensesBreakdownTitle">Expenses Breakdown by Category</h2>
+                <h2 id="expensesBreakdownTitle">Expenses Breakdown by Category</h2> <!-- Translatable -->
                 <div id="no-data-expenses-category" class="no-data-message" style="display: none;">
                     No data found.
                 </div>
@@ -284,10 +276,10 @@
 
     <div id="no-export-modal" class="custom-modal" style="display:none;">
         <div class="modal-content">
-            <h2>Export Failed</h2>
-            <p id="no-export-modal-text">No transactions available to export.</p>
+            <h2 id="exportFailedTitle">Export Failed</h2> <!-- Translatable -->
+            <p id="no-export-modal-text">No transactions available to export.</p> <!-- Translatable -->
             <div class="modal-buttons">
-                <button id="close-no-export-modal" class="btn btn-primary">OK</button>
+                <button id="close-no-export-modal" class="btn btn-primary">OK</button> <!-- Translatable -->
             </div>
         </div>
     </div>
