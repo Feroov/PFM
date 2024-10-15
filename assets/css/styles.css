@@ -335,8 +335,12 @@ body {
     opacity: 0.9;
 }
 
+
 .balance-amount {
-    font-size: 2.5rem;
+    position: relative;
+    /* Parent element for positioning the heart */
+    font-size: 2rem;
+    /* Adjust the size of the balance text */
     font-weight: 700;
     margin: 0.5rem 0;
 }
@@ -2572,37 +2576,114 @@ select#language-selector {
 .slice:nth-child(1)::before,
 .slice:nth-child(1)::after {
     background-color: #3bc263;
-    /* Replaced with new hex */
 }
 
 .slice:nth-child(2)::before,
 .slice:nth-child(2)::after {
     background-color: #fdfdfc;
-    /* Replaced with new hex */
 }
 
 .slice:nth-child(3)::before,
 .slice:nth-child(3)::after {
     background-color: #082d40;
-    /* Replaced with new hex */
 }
 
 .slice:nth-child(4)::before,
 .slice:nth-child(4)::after {
     background-color: #0094e6;
-    /* Replaced with new hex */
 }
 
-/* Optional: If you want to continue using all 6 slices, 
-     you can repeat the colors for the remaining slices */
+
 .slice:nth-child(5)::before,
 .slice:nth-child(5)::after {
     background-color: #3bc263;
-    /* Repeating color */
 }
 
 .slice:nth-child(6)::before,
 .slice:nth-child(6)::after {
     background-color: #fdfdfc;
-    /* Repeating color */
+}
+
+.financial-status {
+    position: absolute;
+    left: 87%;
+    top: 30%;
+    transform: translateY(-50%);
+}
+
+
+#financial-heart {
+    font-size: 3.4rem;
+    background-image: linear-gradient(135deg, #4caf50, #8bc34a);
+    background-clip: text;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-size: 200% 200%;
+    animation: heartbeat 2s infinite;
+    cursor: pointer;
+    -webkit-text-stroke-width: 2px;
+    -webkit-text-stroke-color: black;
+}
+
+/* Tooltip styling */
+.tooltip {
+    visibility: hidden;
+    position: absolute;
+    top: 3%;
+    left: -340%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    text-align: center;
+    font-size: 23px;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    width: auto;
+    max-width: 500px;
+    box-sizing: border-box;
+}
+
+.financial-status.active .tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+
+@keyframes heartbeat {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+@media (max-width: 768px) {
+    .balance-amount {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .financial-status {
+        left: 92%;
+        top: 110%;
+    }
+
+    #financial-heart {
+        font-size: 2rem;
+    }
+
+    .tooltip {
+        top: 30%;
+        left: -420%;
+        font-size: 0.8rem;
+    }
 }

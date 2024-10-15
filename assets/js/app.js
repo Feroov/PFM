@@ -1,5 +1,5 @@
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
+document.addEventListener('DOMContentLoaded', function () {
+    setTimeout(function () {
         const loader = document.querySelector('.loader');
         const overlay = document.querySelector('.loader-overlay');
         const content = document.getElementById('content');
@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loader.classList.add('hidden');
         overlay.classList.add('hidden');
 
-        setTimeout(function() {
+        setTimeout(function () {
             loader.style.display = 'none';
             overlay.style.display = 'none';
             content.style.display = 'block';
@@ -627,21 +627,99 @@ function updateUI() {
 
     // Update balance, income, and expenses with formatted amounts
     const balance = income - expenses;
-    // Animate the balance, income, and expenses
     animateValue(balanceEl, parseFloat(balanceEl.textContent.replace(/[^\d.-]/g, '')), balance, 1500);
     animateValue(incomeTotalEl, parseFloat(incomeTotalEl.textContent.replace(/[^\d.-]/g, '')), income, 1500);
     animateValue(expenseTotalEl, parseFloat(expenseTotalEl.textContent.replace(/[^\d.-]/g, '')), expenses, 1500);
 
-    // Add fade-in effect
-    balanceEl.classList.add('fade-in');
-    incomeTotalEl.classList.add('fade-in');
-    expenseTotalEl.classList.add('fade-in');
-
+    // Update financial health percentage dynamically
+    updateFinancialHealth(expenses, income);
 
     updateChart();
     updateExpenseCategoryChart();
     updateIncomeExpenseTrendsChart();
+    updateHeartColor(expenses, income);
 }
+
+// Function to update financial health percentage
+function updateFinancialHealth(expenses, income) {
+    const healthPercentageEl = document.getElementById('health-percentage');
+    const heartIcon = document.getElementById('financial-heart');
+    
+    // Calculate financial health percentage
+    let financialHealth = ((income - expenses) / income) * 100;
+    if (income === 0) financialHealth = 0; // Avoid division by zero
+    
+    financialHealth = Math.max(0, Math.min(100, financialHealth.toFixed(2))); // Ensure it's between 0 and 100
+    
+    if (healthPercentageEl) {
+        healthPercentageEl.textContent = `${financialHealth}%`;
+    }
+
+    // Update tooltip
+    heartIcon.addEventListener('mouseenter', () => {
+        updateTooltip(financialHealth);
+    });
+}
+
+// Function to update the tooltip content dynamically
+function updateTooltip(health) {
+    const tooltip = document.querySelector('.tooltip');
+    tooltip.innerHTML = `Financial Health: ${health}%`;
+}
+
+// Function to update the heart icon color based on expense-to-income ratio
+function updateHeartColor(expenses, income) {
+    const heartIcon = document.getElementById('financial-heart');
+    let ratio = expenses / income;
+
+    // Prevent division by zero
+    if (income === 0) ratio = 1;
+
+    // Define a gradient with multiple color stops at different ratio intervals
+    let gradient;
+
+    if (ratio <= 0.1) {
+        // Green
+        gradient = `linear-gradient(135deg, #4caf50 0%, #4caf50 100%)`; // Solid green
+    } else if (ratio <= 0.2) {
+        // Green to lighter green
+        gradient = `linear-gradient(135deg, #4caf50 0%, #8bc34a 100%)`;
+    } else if (ratio <= 0.3) {
+        // Green to yellowish green
+        gradient = `linear-gradient(135deg, #8bc34a 0%, #cddc39 100%)`;
+    } else if (ratio <= 0.4) {
+        // Yellowish green to yellow
+        gradient = `linear-gradient(135deg, #cddc39 0%, #ffeb3b 100%)`;
+    } else if (ratio <= 0.5) {
+        // Yellow to light orange
+        gradient = `linear-gradient(135deg, #ffeb3b 0%, #ffc107 100%)`;
+    } else if (ratio <= 0.6) {
+        // Light orange to orange
+        gradient = `linear-gradient(135deg, #ffc107 0%, #ff9800 100%)`;
+    } else if (ratio <= 0.7) {
+        // Orange to darker orange
+        gradient = `linear-gradient(135deg, #ff9800 0%, #ff5722 100%)`;
+    } else if (ratio <= 0.8) {
+        // Dark orange to reddish orange
+        gradient = `linear-gradient(135deg, #ff5722 0%, #f44336 100%)`;
+    } else if (ratio <= 0.9) {
+        // Reddish orange to red
+        gradient = `linear-gradient(135deg, #f44336 0%, #e91e63 100%)`;
+    } else {
+        // Solid red
+        gradient = `linear-gradient(135deg, #e91e63 0%, #e91e63 100%)`; // Solid red
+    }
+
+    // Apply the gradient to the heart icon
+    heartIcon.style.backgroundImage = gradient;
+    heartIcon.style.backgroundClip = "text";
+    heartIcon.style.color = "transparent";
+    heartIcon.style.backgroundSize = '200% 200%'; // Larger area for a smooth transition
+    heartIcon.style.backgroundPosition = 'center';
+}
+
+
+
 
 // Function to edit a transaction
 function editTransaction(index) {
@@ -1639,3 +1717,67 @@ function groupTransactionsByDate(transactions) {
 
     return groupedData;
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const heartIcon = document.getElementById('financial-heart');
+    const tooltip = document.querySelector('.tooltip');
+    const healthPercentageEl = document.getElementById('health-percentage');
+
+    // Fetch actual income and expenses from your transactions
+    let income = transactions
+        .filter(transaction => transaction && transaction.type === 'income')
+        .reduce((sum, transaction) => sum + (transaction.amount || 0), 0);
+
+    let expenses = transactions
+        .filter(transaction => transaction && transaction.type === 'expense')
+        .reduce((sum, transaction) => sum + (transaction.amount || 0), 0);
+
+    // Convert to numbers if they aren't already
+    income = Number(income);
+    expenses = Number(expenses);
+
+    // Prevent division by zero and ensure numbers are valid
+    function calculateHealthPercentage(expenses, income) {
+        if (income === 0) {
+            return 0; // If there's no income, financial health is 0%
+        }
+        let health = ((income - expenses) / income) * 100;
+        return Math.max(0, Math.min(100, health.toFixed(2))); // Ensure percentage is between 0 and 100
+    }
+
+    // Update the tooltip content dynamically
+    function updateTooltip() {
+        const healthPercentage = calculateHealthPercentage(expenses, income);
+        healthPercentageEl.textContent = `${healthPercentage}%`;
+    }
+
+    // Toggle tooltip visibility on heart click
+    heartIcon.addEventListener('click', (event) => {
+        event.stopPropagation();  // Prevent click from closing tooltip immediately
+        const financialStatusDiv = heartIcon.parentElement;
+        if (!financialStatusDiv.classList.contains('active')) {
+            financialStatusDiv.classList.add('active');
+            tooltip.style.visibility = 'visible';
+            tooltip.style.opacity = '1'; // Fade in
+        } else {
+            financialStatusDiv.classList.remove('active');
+            tooltip.style.opacity = '0'; // Start fade out
+            setTimeout(() => {
+                tooltip.style.visibility = 'hidden';
+            }, 300); // Wait for the opacity transition to finish
+        }
+        updateTooltip();  // Update tooltip content
+    });
+
+    // Close the tooltip when clicking outside
+    document.addEventListener('click', (event) => {
+        const financialStatusDiv = heartIcon.parentElement;
+        if (!financialStatusDiv.contains(event.target)) {
+            financialStatusDiv.classList.remove('active'); // Hide tooltip
+            tooltip.style.opacity = '0'; // Start fade out
+            setTimeout(() => {
+                tooltip.style.visibility = 'hidden';
+            }, 300); // Wait for the opacity transition to finish
+        }
+    });
+});
