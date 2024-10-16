@@ -2687,38 +2687,3 @@ select#language-selector {
         font-size: 0.8rem;
     }
 }
-
-
-
-/* Notification container styling */
-.notification {
-    background-color: var(--card-background); /* Background color of the notification */
-    padding: 1rem; /* Padding inside the notification */
-    border-radius: 0.5rem; /* Rounded corners */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
-    max-width: 400px; /* Maximum width for the notification */
-    margin: 0 auto; /* Centering the notification */
-    display: flex;
-    align-items: center; /* Align content vertically */
-    justify-content: center; /* Align content horizontally */
-}
-
-/* Paragraph inside the notification */
-.notification p {
-    font-size: 1rem;
-    color: var(--text-primary); /* Use primary text color */
-    white-space: normal; /* Ensure that text can wrap */
-    word-wrap: break-word; /* Allow long words to break */
-    overflow-wrap: break-word; /* Ensure wrapping on long words */
-    max-width: 30ch; /* Set the maximum width to approximately 30 characters */
-    text-align: left; /* Align text to the left */
-}
-
-/* Add responsiveness for smaller screens */
-@media (max-width: 768px) {
-    .notification p {
-        font-size: 0.9rem; /* Slightly reduce font size for smaller screens */
-        max-width: 25ch; /* Adjust max characters for smaller screens */
-        text-align: center; /* Center the text for smaller devices */
-    }
-}

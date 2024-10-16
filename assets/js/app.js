@@ -949,22 +949,41 @@ function showNotification(message, type = 'success') {
         position: 'fixed',
         top: '20px',
         right: '20px',
-        padding: '1rem',
-        borderRadius: '0.5rem',
-        backgroundColor: type === 'success' ? '#10B981' : '#EF4444',
+        width: '250px', // Set fixed width for a square effect
+        height: '150px', // Set fixed height for a square effect
+        padding: '20px', // Consistent padding
+        borderRadius: '20px', // Keep some roundness for aesthetic
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: type === 'success' ? 'rgba(40, 167, 69, 0.85)' : 'rgba(220, 53, 69, 0.85)', // Add transparency using rgba
         color: 'white',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        fontFamily: 'Arial, sans-serif',
+        fontSize: '18px',
+        textAlign: 'center', // Center text inside the notification
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Subtle shadow
         zIndex: '1000',
-        animation: 'slideIn 0.3s ease-out'
+        opacity: '0',
+        transform: 'translateX(100%)',
+        transition: 'transform 0.5s ease, opacity 0.5s ease'
     });
 
     document.body.appendChild(notification);
 
     setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease-out';
-        setTimeout(() => notification.remove(), 300);
+        notification.style.opacity = '1';
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        notification.style.opacity = '0';
+
+        setTimeout(() => notification.remove(), 500);
     }, 3000);
 }
+
+
 
 function exportToCSV() {
     if (transactions.length === 0) {
