@@ -2005,29 +2005,22 @@ document.addEventListener('DOMContentLoaded', function () {
 console.log('Transactions:', transactions);
 
 function downloadBlob(blob, filename) {
-    if (!(blob instanceof Blob)) {
-        console.error("Provided data is not a Blob.");
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = function() {
-        const base64data = reader.result.split(',')[1]; // Extract base64 data
-        
-        if (window.AndroidInterface) {
+    if (window.AndroidInterface) {
+        // Handle via Android interface
+        const reader = new FileReader();
+        reader.onloadend = function() {
+            const base64data = reader.result.split(',')[1];
             window.AndroidInterface.downloadFileFromBlob(base64data, filename);
-        } else {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-    };
-    reader.readAsDataURL(blob);
+        };
+        reader.readAsDataURL(blob);
+    } else {
+        // Fallback for web browsers
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
 }
-
-
-
