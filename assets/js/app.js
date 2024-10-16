@@ -949,8 +949,8 @@ function showNotification(message, type = 'success') {
         position: 'fixed',
         top: '20px',
         right: '20px',
-        width: '250px', // Set fixed width for a square effect
-        height: '150px', // Set fixed height for a square effect
+        width: '180px', // Set fixed width for a square effect
+        height: '80px', // Set fixed height for a square effect
         padding: '20px', // Consistent padding
         borderRadius: '20px', // Keep some roundness for aesthetic
         display: 'flex',
@@ -959,7 +959,7 @@ function showNotification(message, type = 'success') {
         backgroundColor: type === 'success' ? 'rgba(40, 167, 69, 0.85)' : 'rgba(220, 53, 69, 0.85)', // Add transparency using rgba
         color: 'white',
         fontFamily: 'Arial, sans-serif',
-        fontSize: '18px',
+        fontSize: '14px',
         textAlign: 'center', // Center text inside the notification
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Subtle shadow
         zIndex: '1000',
