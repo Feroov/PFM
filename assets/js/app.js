@@ -189,7 +189,12 @@ function saveEditedTransaction() {
         showNotification('Please enter valid description and amount', 'error');
         return;
     }
-
+    const validDate = new Date(updatedTransactionDate);
+    if (isNaN(validDate.getTime())) {
+        console.error('Invalid date during transaction edit:', updatedTransactionDate);
+        showNotification('Please provide a valid date', 'error');
+        return;
+    }
     // Update the existing transaction
     transactions[editIndex] = {
         ...transactions[editIndex],
@@ -380,8 +385,8 @@ function updateChart() {
 
     // Set colors based on dark or light mode with opacity
     const backgroundColor = isDarkMode ? '#2d3748' : '#ffffff';
-    const incomeBarColor = isDarkMode ? 'rgba(144, 205, 244, 0.6)' : 'rgba(49, 130, 206, 0.6)'; // Softer blue with opacity
-    const expensesBarColor = isDarkMode ? 'rgba(254, 178, 178, 0.6)' : 'rgba(229, 62, 62, 0.6)'; // Softer red with opacity
+    const incomeBarColor = isDarkMode ? 'rgba(75, 192, 192, 0.6)' : 'rgba(75, 192, 192, 0.6)'; // Softer blue with opacity
+    const expensesBarColor = isDarkMode ? 'rgba(229, 62, 62, 0.6)' : 'rgba(229, 62, 62, 0.6)'; // Softer red with opacity
     const borderColor = isDarkMode ? '#1a202c' : '#e2e8f0'; // Darker border for dark mode, lighter for light mode
     const textColor = isDarkMode ? '#ffffff' : '#2d3748'; // White for dark mode, black for light mode
 
@@ -644,13 +649,13 @@ function updateUI() {
 function updateFinancialHealth(expenses, income) {
     const healthPercentageEl = document.getElementById('health-percentage');
     const heartIcon = document.getElementById('financial-heart');
-    
+
     // Calculate financial health percentage
     let financialHealth = ((income - expenses) / income) * 100;
     if (income === 0) financialHealth = 0; // Avoid division by zero
-    
+
     financialHealth = Math.max(0, Math.min(100, financialHealth.toFixed(2))); // Ensure it's between 0 and 100
-    
+
     if (healthPercentageEl) {
         healthPercentageEl.textContent = `${financialHealth}%`;
     }
@@ -726,7 +731,27 @@ function editTransaction(index) {
     openEditModal(index);
 }
 
-// Function to add a new transaction
+let isDescriptionErrorShown = false;  // Flag to track if the error is already shown
+
+// Function to show the error notification only once
+function showErrorNotificationOnce(message) {
+    if (!isDescriptionErrorShown) {
+        showNotification(message, 'error');
+        isDescriptionErrorShown = true; // Set flag to true once error is shown
+    }
+}
+
+// Prevent typing after reaching 60 characters and show error notification
+descriptionEl.addEventListener('input', function () {
+    if (this.value.length > 60) {
+        this.value = this.value.substring(0, 60);  // Prevent more than 60 characters
+        showErrorNotificationOnce('Description cannot exceed 60 characters'); // Show the error once
+    } else if (isDescriptionErrorShown && this.value.length <= 60) {
+        // If the error was shown and the description is valid again, reset the flag
+        isDescriptionErrorShown = false;
+    }
+});
+
 function addTransaction() {
     const description = descriptionEl.value.trim();
     const amount = parseFloat(amountEl.value);
@@ -737,6 +762,11 @@ function addTransaction() {
 
     const transactionDate = document.getElementById('transaction-date').value || new Date().toISOString().split('T')[0]; // Default to today's date if not selected
 
+    // Check for character limit in the description
+    if (description.length > 60) {
+        showErrorNotificationOnce('Description cannot exceed 60 characters');
+        return;
+    }
 
     // Show modal if description or amount is invalid
     if (!description || isNaN(amount)) {
@@ -770,6 +800,16 @@ function addTransaction() {
 
     showNotification('Transaction added successfully!', 'success');
 }
+
+// Prevent typing after reaching 60 characters and show error notification
+descriptionEl.addEventListener('input', function () {
+    if (this.value.length > 60) {
+        this.value = this.value.substring(0, 60);  // Prevent more than 60 characters
+        showNotification('Description cannot exceed 60 characters', 'error');
+    }
+});
+
+
 
 // Function to show the error modal
 function showModal() {
@@ -933,7 +973,7 @@ function exportToCSV() {
     }
 
     const csvRows = [];
-    const headers = ['Description', 'Amount', 'Type', 'Category', 'IsRecurring', 'RecurringInterval'];
+    const headers = ['Description', 'Amount', 'Type', 'Category', 'IsRecurring', 'RecurringInterval', 'Timestamp'];
     csvRows.push(headers.join(','));
 
     transactions.forEach(transaction => {
@@ -943,7 +983,8 @@ function exportToCSV() {
             transaction.type,
             transaction.category,
             transaction.isRecurring ? 'Yes' : 'No',
-            transaction.recurringInterval || ''
+            transaction.recurringInterval || '',
+            transaction.timestamp || new Date().toISOString() // Add the timestamp or current date if missing
         ];
         csvRows.push(row.join(','));
     });
@@ -959,39 +1000,154 @@ function exportToCSV() {
     showNotification('CSV exported successfully!', 'success');
 }
 
-function exportToPDF() {
-    if (transactions.length === 0) {
-        showNoExportModal('PDF');
-        return;
-    }
 
+function exportToPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
+    // Add your logo at the top of the page with adjusted width and height for proper aspect ratio
+    const logo = new Image();
+    logo.src = './assets/img/logo.png'; // Path to your logo
+    doc.addImage(logo, 'PNG', 10, 10, 30, 30); // Adjust width and height for better aspect ratio
+
+    // Set document title and metadata
     doc.setFontSize(20);
-    doc.text("Transaction Report", 10, 10);
+    doc.text("Transaction Report", 105, 25, null, null, "center");
 
-    let y = 20;
+    const currentDate = new Date().toLocaleDateString();
+    doc.setFontSize(10);
+    doc.text(`Generated on: ${currentDate}`, 105, 33, null, null, "center");
+
+    // Custom section (replaces address)
     doc.setFontSize(12);
-    doc.text("Description", 10, y);
-    doc.text("Amount", 60, y);
-    doc.text("Type", 100, y);
-    doc.text("Category", 130, y);
-    doc.text("Recurring", 160, y);
-    y += 10;
+    doc.setFont('helvetica', 'bold');
+    doc.text("Financial Overview", 10, 50);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Date of Report: ${new Date().toLocaleDateString()}`, 10, 60);
+    doc.text(`Number of Transactions: ${transactions.length}`, 10, 70);
 
-    transactions.forEach((transaction) => {
-        doc.text(transaction.description, 10, y);
-        doc.text(transaction.amount.toString(), 60, y);
-        doc.text(transaction.type, 100, y);
-        doc.text(transaction.category, 130, y);
-        doc.text(transaction.isRecurring ? "Yes" : "No", 160, y);
-        y += 10;
+
+    // Section Divider
+    doc.setDrawColor(0, 0, 0);
+    doc.line(10, 75, 200, 75);
+
+    // Headers and transaction data
+    const headers = [
+        { header: 'Description', dataKey: 'description' },
+        { header: 'Amount', dataKey: 'amount' },
+        { header: 'Type', dataKey: 'type' },
+        { header: 'Category', dataKey: 'category' },
+        { header: 'Recurring', dataKey: 'isRecurring' },
+        { header: 'Interval', dataKey: 'recurringInterval' }
+    ];
+
+    // Format the rows and replace 'eur' with the proper symbol dynamically
+    const currencySymbol = currentCurrency === 'usd' ? '$' : currentCurrency === 'gbp' ? '£' : '€';
+
+    const rows = transactions.map(transaction => ({
+        description: transaction.description,
+        amount: `${currencySymbol}${transaction.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, // Format amount with commas
+        type: transaction.type,
+        category: transaction.category,
+        isRecurring: transaction.isRecurring ? 'Yes' : 'No',
+        recurringInterval: transaction.recurringInterval || ''
+    }));
+
+
+    // Customized autoTable
+    doc.autoTable({
+        startY: 80, // Start after the logo and title
+        head: [headers.map(col => col.header)], // Only take the header names
+        body: rows.map(row => Object.values(row)), // Map row data into an array of values
+        margin: { top: 10, left: 10, right: 10 },
+        styles: {
+            fontSize: 10,
+            cellPadding: 4,
+            overflow: 'linebreak',
+            halign: 'left',
+            valign: 'middle',
+        },
+        headStyles: {
+            fillColor: [100, 149, 237], // Custom header background color
+            textColor: [255, 255, 255], // White text color
+            fontStyle: 'bold'
+        },
+        bodyStyles: {
+            halign: 'left',
+            textColor: [0, 0, 0],
+        },
+        didDrawPage: function (data) {
+            doc.setFontSize(10);
+        },
     });
 
-    doc.save("transactions.pdf");
-    showNotification('PDF exported successfully!', 'success');
+    // Calculate the totals as numbers before formatting
+    const totalIncomeValue = transactions.filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + t.amount, 0);
+
+    const totalExpensesValue = transactions.filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + t.amount, 0);
+
+    // Calculate the balance before formatting
+    const balanceValue = totalIncomeValue - totalExpensesValue;
+
+    // Format the totals and balance for display with commas and decimals
+    const totalIncome = totalIncomeValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const totalExpenses = totalExpensesValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const balance = balanceValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Summary:', 10, doc.autoTable.previous.finalY + 10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Total Income: ${currencySymbol}${totalIncome}`, 10, doc.autoTable.previous.finalY + 20);
+    doc.text(`Total Expenses: ${currencySymbol}${totalExpenses}`, 10, doc.autoTable.previous.finalY + 30);
+    doc.text(`Current Balance: ${currencySymbol}${balance}`, 10, doc.autoTable.previous.finalY + 40);
+
+
+    doc.save(`transactions_report_${currentDate}.pdf`);
 }
+
+
+// Helper function to wrap text to a max length
+function wrapText(text, maxLength) {
+    const words = text.split(' ');
+    let lines = [];
+    let currentLine = '';
+
+    words.forEach(word => {
+        if ((currentLine + word).length < maxLength) {
+            currentLine += word + ' ';
+        } else {
+            lines.push(currentLine.trim());
+            currentLine = word + ' ';
+        }
+    });
+    if (currentLine) lines.push(currentLine.trim());
+
+    return lines.join('\n');
+}
+
+
+// Helper function to wrap text
+function wrapText(text, maxLength) {
+    const words = text.split(' ');
+    let lines = [];
+    let currentLine = '';
+
+    words.forEach(word => {
+        if ((currentLine + word).length < maxLength) {
+            currentLine += word + ' ';
+        } else {
+            lines.push(currentLine.trim());
+            currentLine = word + ' ';
+        }
+    });
+    if (currentLine) lines.push(currentLine.trim());
+
+    return lines.join('\n');
+}
+
 
 function exportToExcel() {
     if (transactions.length === 0) {
@@ -1000,14 +1156,17 @@ function exportToExcel() {
     }
 
     const wb = XLSX.utils.book_new();
-    const ws_data = [["Description", "Amount", "Type", "Category", "Recurring"]];
+    const ws_data = [["Description", "Amount", "Type", "Category", "Recurring", "RecurringInterval", "Timestamp"]];
+
     transactions.forEach((transaction) => {
         ws_data.push([
             transaction.description,
             transaction.amount,
             transaction.type,
             transaction.category,
-            transaction.isRecurring ? "Yes" : "No"
+            transaction.isRecurring ? "Yes" : "No",
+            transaction.recurringInterval || '',
+            new Date(transaction.timestamp).toISOString() // Ensure timestamp is properly formatted as ISO string
         ]);
     });
 
@@ -1035,6 +1194,23 @@ function exportToJSON() {
     showNotification('JSON exported successfully!', 'success');
 }
 
+function tryParseDate(dateString) {
+    const dateFormats = [
+        'MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD', 'MM-DD-YYYY', 'DD-MM-YYYY'
+    ];
+
+    for (const format of dateFormats) {
+        const parsedDate = moment(dateString, format, true);
+        if (parsedDate.isValid()) {
+            return new Date(parsedDate.toISOString());
+        }
+    }
+
+    // Return `null` if no valid format is found
+    return null;
+}
+
+
 // Function to import transactions from CSV
 function importFromCSV(event) {
     const file = event.target.files[0];
@@ -1052,15 +1228,28 @@ function importFromCSV(event) {
             const newTransactions = rows.slice(1).map(row => {
                 const columns = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 
+                let timestamp = columns[6] ? new Date(columns[6].trim()) : new Date(); // Replace empty or invalid with current date
+
+                // Attempt to parse the date in different formats if invalid
+                if (isNaN(timestamp.getTime())) {
+                    timestamp = tryParseDate(columns[6].trim());
+                }
+
+                if (!timestamp || isNaN(timestamp.getTime())) {
+                    console.error('Invalid timestamp in CSV row:', row);
+                    return null; // Skip invalid rows
+                }
+
                 return {
                     description: columns[0].replace(/"/g, '').trim(),
                     amount: parseFloat(columns[1]),
                     type: columns[2].trim(),
                     category: columns[3].trim(),
                     isRecurring: columns[4].trim() === 'Yes',
-                    recurringInterval: columns[5] ? columns[5].trim() : null
+                    recurringInterval: columns[5] ? columns[5].trim() : null,
+                    timestamp: timestamp.toISOString()
                 };
-            });
+            }).filter(transaction => transaction !== null); // Filter out invalid transactions
 
             const validTransactions = newTransactions.filter(transaction =>
                 transaction.description &&
@@ -1092,6 +1281,7 @@ function importFromCSV(event) {
     reader.readAsText(file);
 }
 
+
 // Add event listener for PDF export button
 document.getElementById('export-pdf-btn').addEventListener('click', exportToPDF);
 
@@ -1117,13 +1307,19 @@ function importFromExcel(event) {
         const sheetData = XLSX.utils.sheet_to_json(worksheet);
 
         const newTransactions = sheetData.map(row => {
+            let timestamp = new Date(row['Timestamp']); // Parse the timestamp as a date
+            if (isNaN(timestamp.getTime())) {
+                // Handle cases where the date is invalid
+                timestamp = new Date(); // Use the current date if timestamp is invalid
+            }
             return {
                 description: row['Description'],
                 amount: parseFloat(row['Amount']),
                 type: row['Type'],
                 category: row['Category'],
                 isRecurring: row['Recurring'] === 'Yes',
-                recurringInterval: row['RecurringInterval'] || null
+                recurringInterval: row['RecurringInterval'] || null,
+                timestamp: timestamp.toISOString() // Store the timestamp as an ISO string
             };
         });
 
@@ -1151,6 +1347,8 @@ function importFromExcel(event) {
 
     reader.readAsArrayBuffer(file);
 }
+
+
 
 // Add event listener for Excel import button
 document.getElementById('import-excel-btn').addEventListener('click', () => {
@@ -1330,37 +1528,47 @@ document.addEventListener('DOMContentLoaded', function () {
         const loadingIndicator = document.createElement('div');
         loadingIndicator.className = 'loading-indicator';
         loadingIndicator.innerHTML = `
-            <div class="spinner"></div>
-            <p>Deleting transactions...</p>
-        `;
+        <div class="spinner"></div>
+        <p>Deleting transactions...</p>
+    `;
         transactionListEl.appendChild(loadingIndicator);
+
+        let deleteTimer;
+        let isBulkDeleteTriggered = false;
+
+        // Function to delete remaining transactions in bulk
+        function bulkDeleteRemaining() {
+            if (isBulkDeleteTriggered) return;
+            isBulkDeleteTriggered = true;
+
+            transactions = []; // Clear all transactions
+            localStorage.setItem('transactions', JSON.stringify(transactions)); // Update local storage
+            updateUI(); // Update the UI after deletion
+            loadingIndicator.remove(); // Remove loading indicator
+            showNotification('All transactions deleted successfully', 'success');
+        }
 
         // Add deleting class to all transactions with a slight delay between each
         transactionEls.forEach((transactionEl, index) => {
             setTimeout(() => {
                 transactionEl.classList.add('deleting');
-            }, index * 100);
+                // Check if the delete timer has expired
+                if (isBulkDeleteTriggered) return;
+            }, index * 100); // Delay each transaction deletion slightly
         });
 
-        // After all animations have completed, delete all transactions
-        setTimeout(() => {
-            transactions = [];
-            localStorage.setItem('transactions', JSON.stringify(transactions));
-            updateUI();
-            loadingIndicator.remove();
-            showNotification('All transactions deleted successfully', 'success');
+        // Start the timer, bulk delete after 3 seconds
+        deleteTimer = setTimeout(bulkDeleteRemaining, 3000);
 
-            // Fade out the modal after deletion is completed
-            const modal = document.querySelector('.custom-modal');
-            if (modal) {
-                modal.classList.add('fade-out');
-                setTimeout(() => modal.remove(), 500);
-            }
-        }, transactionLength * 100 + 500);
+        // Ensure final deletion after the last animation
+        setTimeout(() => {
+            if (!isBulkDeleteTriggered) bulkDeleteRemaining();
+        }, transactionLength * 100 + 500); // Time to ensure animations complete + a small buffer
     }
 
-
+    // Bind the deleteAll function to your delete button
     deleteAllBtn.addEventListener('click', showDeleteConfirmationModal);
+
 
     const style = document.createElement('style');
     style.textContent = `
@@ -1702,21 +1910,31 @@ function groupTransactionsByDate(transactions) {
     const groupedData = {};
 
     transactions.forEach(transaction => {
-        const date = new Date(transaction.timestamp).toISOString().split('T')[0]; // Get the date in YYYY-MM-DD format
+        const timestamp = transaction.timestamp;
+        const date = new Date(timestamp);
 
-        if (!groupedData[date]) {
-            groupedData[date] = { income: 0, expenses: 0 };
+        // Check if the date is valid
+        if (isNaN(date.getTime())) {
+            console.error(`Invalid date found: ${timestamp}`);
+            return; // Skip this transaction
+        }
+
+        const dateStr = date.toISOString().split('T')[0];
+
+        if (!groupedData[dateStr]) {
+            groupedData[dateStr] = { income: 0, expenses: 0 };
         }
 
         if (transaction.type === 'income') {
-            groupedData[date].income += transaction.amount;
+            groupedData[dateStr].income += transaction.amount;
         } else if (transaction.type === 'expense') {
-            groupedData[date].expenses += transaction.amount;
+            groupedData[dateStr].expenses += transaction.amount;
         }
     });
 
     return groupedData;
 }
+
 
 document.addEventListener('DOMContentLoaded', function () {
     const heartIcon = document.getElementById('financial-heart');
@@ -1781,3 +1999,4 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+console.log('Transactions:', transactions);
