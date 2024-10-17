@@ -1996,15 +1996,24 @@ console.log('Transactions:', transactions);
 
 function downloadBlob(url, filename) {
     fetch(url)
-        .then(response => response.blob())  // Ensure the response is converted to a Blob
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.blob();
+        })
         .then(blob => {
+            const mimeType = blob.type;
+            const isPDF = mimeType === 'application/pdf';
+            const isExcel = mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
             if (window.AndroidInterface) {
                 const reader = new FileReader();
                 reader.onloadend = function () {
                     const base64data = reader.result.split(',')[1];
                     window.AndroidInterface.downloadFileFromBlob(base64data, filename);
                 };
-                reader.readAsDataURL(blob);
+                reader.readAsDataURL(blob);  // Convert Blob to Base64 data URL
             } else {
                 // Fallback for web browsers
                 const downloadUrl = window.URL.createObjectURL(blob);
@@ -2014,6 +2023,7 @@ function downloadBlob(url, filename) {
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
+                window.URL.revokeObjectURL(downloadUrl); // Free memory
             }
         })
         .catch(error => {
@@ -2021,3 +2031,4 @@ function downloadBlob(url, filename) {
             alert("Download failed. Please try again.");
         });
 }
+
