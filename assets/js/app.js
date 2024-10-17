@@ -1994,41 +1994,23 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 console.log('Transactions:', transactions);
 
-function downloadBlob(url, filename) {
-    fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.blob();
-        })
-        .then(blob => {
-            const mimeType = blob.type;
-            const isPDF = mimeType === 'application/pdf';
-            const isExcel = mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-
-            if (window.AndroidInterface) {
-                const reader = new FileReader();
-                reader.onloadend = function () {
-                    const base64data = reader.result.split(',')[1];
-                    window.AndroidInterface.downloadFileFromBlob(base64data, filename);
-                };
-                reader.readAsDataURL(blob);  // Convert Blob to Base64 data URL
-            } else {
-                // Fallback for web browsers
-                const downloadUrl = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = downloadUrl;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(downloadUrl); // Free memory
-            }
-        })
-        .catch(error => {
-            console.error("Error fetching blob:", error);
-            alert("Download failed. Please try again.");
-        });
+function downloadBlob(blob, filename) {
+    if (window.AndroidInterface) {
+        // Handle via Android interface
+        const reader = new FileReader();
+        reader.onloadend = function () {
+            const base64data = reader.result.split(',')[1];
+            window.AndroidInterface.downloadFileFromBlob(base64data, filename);
+        };
+        reader.readAsDataURL(blob);
+    } else {
+        // Fallback for web browsers
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
 }
-
