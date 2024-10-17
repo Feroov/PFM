@@ -2014,12 +2014,9 @@ function downloadBlob(blob, filename) {
     reader.onloadend = function() {
         const base64data = reader.result.split(',')[1]; // Extract base64 data
         
-        // Check if the user is on Android
         if (window.AndroidInterface) {
-            // Call the Android interface to save the file
             window.AndroidInterface.downloadFileFromBlob(base64data, filename);
         } else {
-            // For web, use the standard download process
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -2029,7 +2026,7 @@ function downloadBlob(blob, filename) {
             document.body.removeChild(a);
         }
     };
-    reader.readAsDataURL(blob);  // Convert blob to base64 for Android
+    reader.readAsDataURL(blob);
 }
 
 
