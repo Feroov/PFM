@@ -1165,25 +1165,16 @@ function exportToExcel() {
     const ws = XLSX.utils.aoa_to_sheet(ws_data);
     XLSX.utils.book_append_sheet(wb, ws, "Transactions");
 
-    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-    const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+    // Correct binary writing for Excel
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([wbout], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
     const url = window.URL.createObjectURL(blob);
 
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = "transactions.xlsx";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const currentDate = new Date().toISOString().split('T')[0];
+    const fileName = `transactions_${currentDate}.xlsx`;
 
-    showNotification('Excel exported successfully!', 'success');
-}
-
-function s2ab(s) {
-    const buf = new ArrayBuffer(s.length);
-    const view = new Uint8Array(buf);
-    for (let i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
-    return buf;
+    // Correct download with .xlsx extension
+    downloadBlob(blob, fileName);
 }
 
 
