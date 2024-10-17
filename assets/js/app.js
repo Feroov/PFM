@@ -1028,50 +1028,52 @@ function exportToPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    // Add your logo at the top of the page with adjusted width and height for proper aspect ratio
+    // Add your logo at the top of the page (if you have one)
     const logo = new Image();
     logo.src = './assets/img/logo.png'; // Path to your logo
-    doc.addImage(logo, 'PNG', 10, 10, 30, 30); // Adjust width and height for better aspect ratio
+    doc.addImage(logo, 'PNG', 10, 10, 30, 30); // Adjust width and height as needed
 
-    // Set document title and metadata
+    // Add a title
     doc.setFontSize(20);
     doc.text("Transaction Report", 105, 25, null, null, "center");
 
+    // Add date and some metadata
     const currentDate = new Date().toLocaleDateString();
-    doc.setFontSize(10);
+    doc.setFontSize(12);
     doc.text(`Generated on: ${currentDate}`, 105, 33, null, null, "center");
 
-    // Custom section (replaces address)
-    doc.setFontSize(12);
+    // Add a header for the report
+    doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.text("Financial Overview", 10, 50);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Date of Report: ${new Date().toLocaleDateString()}`, 10, 60);
-    doc.text(`Number of Transactions: ${transactions.length}`, 10, 70);
+    doc.text(`Number of Transactions: ${transactions.length}`, 10, 60);
+    doc.text(`Currency: ${currencySymbols[currentCurrency]}`, 10, 70);
 
-    // Headers and transaction data
+    // Prepare transaction data for the table
     const headers = [
         { header: 'Description', dataKey: 'description' },
         { header: 'Amount', dataKey: 'amount' },
         { header: 'Type', dataKey: 'type' },
         { header: 'Category', dataKey: 'category' },
         { header: 'Recurring', dataKey: 'isRecurring' },
-        { header: 'Interval', dataKey: 'recurringInterval' }
+        { header: 'Interval', dataKey: 'recurringInterval' },
+        { header: 'Date', dataKey: 'timestamp' }
     ];
 
-    const currencySymbol = currencySymbols[currentCurrency];
     const rows = transactions.map(transaction => ({
         description: transaction.description,
-        amount: `${currencySymbol}${transaction.amount.toFixed(2)}`,
+        amount: `${currencySymbols[currentCurrency]}${transaction.amount.toFixed(2)}`,
         type: transaction.type,
         category: transaction.category,
         isRecurring: transaction.isRecurring ? 'Yes' : 'No',
-        recurringInterval: transaction.recurringInterval || ''
+        recurringInterval: transaction.recurringInterval || '-',
+        timestamp: new Date(transaction.timestamp).toLocaleDateString()
     }));
 
     // AutoTable for transactions
     doc.autoTable({
-        startY: 80,
+        startY: 80, // Starting point after the header
         head: [headers.map(col => col.header)],
         body: rows.map(row => Object.values(row)),
         margin: { top: 10, left: 10, right: 10 },
@@ -1080,23 +1082,21 @@ function exportToPDF() {
             cellPadding: 4,
         },
         headStyles: {
-            fillColor: [100, 149, 237],
-            textColor: [255, 255, 255],
-        }
+            fillColor: [100, 149, 237], // Light blue header
+            textColor: [255, 255, 255], // White text in header
+        },
+        columnStyles: {
+            1: { halign: 'right' }, // Align amount column to the right
+        },
     });
 
-    // Download the generated PDF
+    // Generate the PDF Blob
     const pdfBlob = doc.output('blob');
-    const url = window.URL.createObjectURL(pdfBlob);
+    const currentDateForFilename = new Date().toISOString().split('T')[0];
+    const fileName = `transactions_report_${currentDateForFilename}.pdf`;
 
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `transactions_report_${currentDate}.pdf`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    showNotification('PDF exported successfully!', 'success');
+    // Download the generated PDF
+    downloadBlob(pdfBlob, fileName);
 }
 
 
@@ -1165,13 +1165,11 @@ function exportToExcel() {
     const ws = XLSX.utils.aoa_to_sheet(ws_data);
     XLSX.utils.book_append_sheet(wb, ws, "Transactions");
 
-    // Generate the Excel file as a Blob
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([wbout], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
     const currentDate = new Date().toISOString().split('T')[0];
     const fileName = `transactions_${currentDate}.xlsx`;
 
-    // Call the downloadBlob function to handle both web and mobile contexts
     downloadBlob(blob, fileName);
 }
 
@@ -1184,19 +1182,11 @@ function exportToJSON() {
 
     const jsonContent = JSON.stringify(transactions, null, 2);
     const blob = new Blob([jsonContent], { type: 'application/json' });
-    const url = window.URL.createObjectURL(blob);
+    const currentDate = new Date().toISOString().split('T')[0];
+    const fileName = `transactions_${currentDate}.json`;
 
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'transactions.json';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    showNotification('JSON exported successfully!', 'success');
+    downloadBlob(blob, fileName);
 }
-
-
 function tryParseDate(dateString) {
     const dateFormats = [
         'MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD', 'MM-DD-YYYY', 'DD-MM-YYYY'
@@ -2008,7 +1998,7 @@ function downloadBlob(blob, filename) {
     if (window.AndroidInterface) {
         // Handle via Android interface
         const reader = new FileReader();
-        reader.onloadend = function() {
+        reader.onloadend = function () {
             const base64data = reader.result.split(',')[1];
             window.AndroidInterface.downloadFileFromBlob(base64data, filename);
         };
@@ -2024,3 +2014,5 @@ function downloadBlob(blob, filename) {
         document.body.removeChild(a);
     }
 }
+
+
