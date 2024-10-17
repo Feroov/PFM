@@ -1165,15 +1165,13 @@ function exportToExcel() {
     const ws = XLSX.utils.aoa_to_sheet(ws_data);
     XLSX.utils.book_append_sheet(wb, ws, "Transactions");
 
-    // Correct binary writing for Excel
+    // Generate the Excel file as a Blob
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([wbout], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-    const url = window.URL.createObjectURL(blob);
-
     const currentDate = new Date().toISOString().split('T')[0];
     const fileName = `transactions_${currentDate}.xlsx`;
 
-    // Correct download with .xlsx extension
+    // Call the downloadBlob function to handle both web and mobile contexts
     downloadBlob(blob, fileName);
 }
 
@@ -2011,13 +2009,22 @@ function downloadBlob(blob, filename) {
     reader.onloadend = function() {
         const base64data = reader.result.split(',')[1]; // Extract base64 data
 
-        // Call the Android interface method to send the file content to the Android app
+        // Check if the user is on Android
         if (window.AndroidInterface) {
+            // Call the Android interface to save the file with a proper filename
             window.AndroidInterface.downloadFileFromBlob(base64data, filename);
+        } else {
+            // For web, use the standard download process
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
     };
-    reader.readAsDataURL(blob); // Convert blob to base64
+    reader.readAsDataURL(blob); // Convert blob to base64 for Android
 }
-
 
 
