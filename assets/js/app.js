@@ -949,10 +949,10 @@ function showNotification(message, type = 'success') {
         position: 'fixed',
         top: '20px',
         right: '20px',
-        width: '180px', // Set fixed width for a square effect
-        height: '80px', // Set fixed height for a square effect
-        padding: '20px', // Consistent padding
-        borderRadius: '20px', // Keep some roundness for aesthetic
+        width: '180px',
+        height: '80px',
+        padding: '20px',
+        borderRadius: '20px',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -960,8 +960,8 @@ function showNotification(message, type = 'success') {
         color: 'white',
         fontFamily: 'Arial, sans-serif',
         fontSize: '14px',
-        textAlign: 'center', // Center text inside the notification
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Subtle shadow
+        textAlign: 'center',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
         zIndex: '1000',
         opacity: '0',
         transform: 'translateX(100%)',
@@ -2019,3 +2019,13 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 console.log('Transactions:', transactions);
+
+function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    window.location.href = url; // This will trigger the download in the browser
+
+    // Or send the blob URL to Android using a bridge
+    if (window.AndroidInterface) {
+        window.AndroidInterface.downloadFileFromBlob(url, filename);
+    }
+}
