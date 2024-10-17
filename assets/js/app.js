@@ -2005,19 +2005,26 @@ document.addEventListener('DOMContentLoaded', function () {
 console.log('Transactions:', transactions);
 
 function downloadBlob(blob, filename) {
-    if (!blob || !(blob instanceof Blob)) {
-        console.error('The provided data is not a valid Blob.');
-        return;
-    }
+    const reader = new FileReader();
+    reader.onloadend = function() {
+        const base64data = reader.result.split(',')[1]; // Extract base64 data
 
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);  // Clean up the URL object
+        // Check if the user is on Android
+        if (window.AndroidInterface) {
+            // Call the Android interface to save the file with a proper filename
+            window.AndroidInterface.downloadFileFromBlob(base64data, filename);
+        } else {
+            // For web, use the standard download process
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    };
+    reader.readAsDataURL(blob); // Convert blob to base64 for Android
 }
 
 
