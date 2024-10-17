@@ -2006,20 +2006,18 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 console.log('Transactions:', transactions);
 
-function downloadBlob(blobUrl, filename) {
-    fetch(blobUrl)
-        .then(response => response.blob())
-        .then(blob => {
-            const reader = new FileReader();
-            reader.onloadend = function() {
-                const base64data = reader.result.split(',')[1]; // Extract base64 data
-                if (window.AndroidInterface) {
-                    window.AndroidInterface.downloadFileFromBlob(base64data, filename);
-                }
-            };
-            reader.readAsDataURL(blob); // Convert blob to Base64
-        })
-        .catch(error => console.error("Error downloading blob:", error));
+function downloadBlob(blob, filename) {
+    const reader = new FileReader();
+    reader.onloadend = function() {
+        const base64data = reader.result.split(',')[1]; // Extract base64 data
+
+        // Call the Android interface method to send the file content to the Android app
+        if (window.AndroidInterface) {
+            window.AndroidInterface.downloadFileFromBlob(base64data, filename);
+        }
+    };
+    reader.readAsDataURL(blob); // Convert blob to base64
 }
+
 
 
