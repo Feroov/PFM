@@ -1008,13 +1008,17 @@ function exportToCSV() {
         csvRows.push(row.join(','));
     });
 
-    const csvContent = csvRows.join('\n');
+    const csvContent = csvRows.join('\n'); // Join all rows with newlines
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('href', url);
-    a.setAttribute('download', 'transactions.csv');
-    a.click();
+
+    // Create a temporary link to trigger download
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'transactions.csv'; // Name of the file
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link); // Clean up the link
 
     showNotification('CSV exported successfully!', 'success');
 }
@@ -1045,11 +1049,6 @@ function exportToPDF() {
     doc.text(`Date of Report: ${new Date().toLocaleDateString()}`, 10, 60);
     doc.text(`Number of Transactions: ${transactions.length}`, 10, 70);
 
-
-    // Section Divider
-    doc.setDrawColor(0, 0, 0);
-    doc.line(10, 75, 200, 75);
-
     // Headers and transaction data
     const headers = [
         { header: 'Description', dataKey: 'description' },
@@ -1060,72 +1059,46 @@ function exportToPDF() {
         { header: 'Interval', dataKey: 'recurringInterval' }
     ];
 
-    // Format the rows and replace 'eur' with the proper symbol dynamically
-    const currencySymbol = currentCurrency === 'usd' ? '$' : currentCurrency === 'gbp' ? '£' : '€';
-
+    const currencySymbol = currencySymbols[currentCurrency];
     const rows = transactions.map(transaction => ({
         description: transaction.description,
-        amount: `${currencySymbol}${transaction.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, // Format amount with commas
+        amount: `${currencySymbol}${transaction.amount.toFixed(2)}`,
         type: transaction.type,
         category: transaction.category,
         isRecurring: transaction.isRecurring ? 'Yes' : 'No',
         recurringInterval: transaction.recurringInterval || ''
     }));
 
-
-    // Customized autoTable
+    // AutoTable for transactions
     doc.autoTable({
-        startY: 80, // Start after the logo and title
-        head: [headers.map(col => col.header)], // Only take the header names
-        body: rows.map(row => Object.values(row)), // Map row data into an array of values
+        startY: 80,
+        head: [headers.map(col => col.header)],
+        body: rows.map(row => Object.values(row)),
         margin: { top: 10, left: 10, right: 10 },
         styles: {
             fontSize: 10,
             cellPadding: 4,
-            overflow: 'linebreak',
-            halign: 'left',
-            valign: 'middle',
         },
         headStyles: {
-            fillColor: [100, 149, 237], // Custom header background color
-            textColor: [255, 255, 255], // White text color
-            fontStyle: 'bold'
-        },
-        bodyStyles: {
-            halign: 'left',
-            textColor: [0, 0, 0],
-        },
-        didDrawPage: function (data) {
-            doc.setFontSize(10);
-        },
+            fillColor: [100, 149, 237],
+            textColor: [255, 255, 255],
+        }
     });
 
-    // Calculate the totals as numbers before formatting
-    const totalIncomeValue = transactions.filter(t => t.type === 'income')
-        .reduce((sum, t) => sum + t.amount, 0);
+    // Download the generated PDF
+    const pdfBlob = doc.output('blob');
+    const url = window.URL.createObjectURL(pdfBlob);
 
-    const totalExpensesValue = transactions.filter(t => t.type === 'expense')
-        .reduce((sum, t) => sum + t.amount, 0);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `transactions_report_${currentDate}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 
-    // Calculate the balance before formatting
-    const balanceValue = totalIncomeValue - totalExpensesValue;
-
-    // Format the totals and balance for display with commas and decimals
-    const totalIncome = totalIncomeValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const totalExpenses = totalExpensesValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const balance = balanceValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Summary:', 10, doc.autoTable.previous.finalY + 10);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Total Income: ${currencySymbol}${totalIncome}`, 10, doc.autoTable.previous.finalY + 20);
-    doc.text(`Total Expenses: ${currencySymbol}${totalExpenses}`, 10, doc.autoTable.previous.finalY + 30);
-    doc.text(`Current Balance: ${currencySymbol}${balance}`, 10, doc.autoTable.previous.finalY + 40);
-
-
-    doc.save(`transactions_report_${currentDate}.pdf`);
+    showNotification('PDF exported successfully!', 'success');
 }
+
 
 
 // Helper function to wrap text to a max length
@@ -1185,16 +1158,34 @@ function exportToExcel() {
             transaction.category,
             transaction.isRecurring ? "Yes" : "No",
             transaction.recurringInterval || '',
-            new Date(transaction.timestamp).toISOString() // Ensure timestamp is properly formatted as ISO string
+            new Date(transaction.timestamp).toISOString()
         ]);
     });
 
     const ws = XLSX.utils.aoa_to_sheet(ws_data);
     XLSX.utils.book_append_sheet(wb, ws, "Transactions");
 
-    XLSX.writeFile(wb, "transactions.xlsx");
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+    const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = "transactions.xlsx";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
     showNotification('Excel exported successfully!', 'success');
 }
+
+function s2ab(s) {
+    const buf = new ArrayBuffer(s.length);
+    const view = new Uint8Array(buf);
+    for (let i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+    return buf;
+}
+
 
 function exportToJSON() {
     if (transactions.length === 0) {
@@ -1205,13 +1196,17 @@ function exportToJSON() {
     const jsonContent = JSON.stringify(transactions, null, 2);
     const blob = new Blob([jsonContent], { type: 'application/json' });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('href', url);
-    a.setAttribute('download', 'transactions.json');
-    a.click();
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'transactions.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 
     showNotification('JSON exported successfully!', 'success');
 }
+
 
 function tryParseDate(dateString) {
     const dateFormats = [
@@ -2021,11 +2016,15 @@ document.addEventListener('DOMContentLoaded', function () {
 console.log('Transactions:', transactions);
 
 function downloadBlob(blob, filename) {
-    const url = URL.createObjectURL(blob);
-    window.location.href = url; // This will trigger the download in the browser
-
-    // Or send the blob URL to Android using a bridge
-    if (window.AndroidInterface) {
-        window.AndroidInterface.downloadFileFromBlob(url, filename);
-    }
+    const reader = new FileReader();
+    reader.onloadend = function() {
+        const base64data = reader.result.split(',')[1]; // Extract base64 data (removing the data URL header)
+        
+        // Call the Android interface method to send the file content to the Android app
+        if (window.AndroidInterface) {
+            window.AndroidInterface.downloadFileFromBlob(base64data, filename);
+        }
+    };
+    reader.readAsDataURL(blob); // Convert blob to base64
 }
+
