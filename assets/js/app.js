@@ -950,7 +950,7 @@ function showNotification(message, type = 'success') {
         top: '20px',
         right: '20px',
         width: '180px',
-        height: '80px',
+        height: '120px',
         padding: '20px',
         borderRadius: '20px',
         display: 'flex',
